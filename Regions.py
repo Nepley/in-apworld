@@ -87,10 +87,11 @@ def get_regions(difficulty_check, extra, exclude_lunatic):
 				regions[f"[{character}] Early"]["exits"].append(f"[{difficulty}][{character}] Stage 1")
 				regions[f"[{character}] Early"]["exits"].append(f"[{difficulty}][{character}] Stage 2")
 				regions[f"[{character}] Mid"]["exits"].append(f"[{difficulty}][{character}] Stage 3")
-				regions[f"[{character}] Mid"]["exits"].append(f"[{difficulty}][{character}] Stage 4")
+				regions[f"[{character}] Mid"]["exits"].append(f"[{difficulty}][{character}] Stage 4A")
+				regions[f"[{character}] Mid"]["exits"].append(f"[{difficulty}][{character}] Stage 4B")
 				regions[f"[{character}] Late"]["exits"].append(f"[{difficulty}][{character}] Stage 5")
-				if difficulty != "Easy":
-					regions[f"[{character}] Late"]["exits"].append(f"[{difficulty}][{character}] Stage 6")
+				regions[f"[{character}] Late"]["exits"].append(f"[{difficulty}][{character}] Stage 6A")
+				regions[f"[{character}] Late"]["exits"].append(f"[{difficulty}][{character}] Stage 6B")
 
 				level = 0
 				for stage in STAGES_LIST:
