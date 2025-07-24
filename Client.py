@@ -399,7 +399,7 @@ class TouhouContext(CommonContext):
 		"""
 		try:
 			bossPresent = False
-			currentMode = -1
+			currentMode = -1 # -1: No mode, 0: In Game, 1: In Menu
 			currentLives = 0
 			bossCounter = -1
 			resourcesGiven = False
@@ -416,8 +416,8 @@ class TouhouContext(CommonContext):
 				# Mode Check
 				if(gameMode == IN_GAME and not noCheck):
 					# A level has started
-					if(currentMode != IN_GAME):
-						currentMode = IN_GAME
+					if(currentMode != 0):
+						currentMode = 0
 						bossCounter = -1
 						bossPresent = False
 						currentScore = 0
@@ -474,11 +474,11 @@ class TouhouContext(CommonContext):
 							self.handler.giveBombs()
 
 						currentLives = self.handler.getCurrentLives()
-				elif(gameMode == IN_MENU):
+				elif(gameMode in IN_MENU):
 					# We enter in the menu
-					if(currentMode != IN_MENU):
+					if(currentMode != 1):
 						self.handler.resetStageVariables()
-						currentMode = IN_MENU
+						currentMode = 1
 						resourcesGiven = False
 						noCheck = False # We enable the checks once we're in the menu
 					self.updateStageList()
@@ -506,7 +506,7 @@ class TouhouContext(CommonContext):
 				if game_mode == -2:
 					continue
 
-				if game_mode == IN_MENU:
+				if game_mode in IN_MENU:
 					try:
 						menu = self.handler.getMenu()
 					except Exception as e:
