@@ -242,7 +242,7 @@ class gameHandler:
 		if self.gameController.getStage() == 2 or self.gameController.getStage() == 6:
 			if self.gameController.getIsBossPresent2() == 1:
 				first_boss_present = self.gameController.getIsBossPresent1()
-				sleep(0.1)
+				sleep(0.5)
 				second_boss_present = self.gameController.getIsBossPresent1()
 				check = first_boss_present == 1 or second_boss_present == 1
 		else:

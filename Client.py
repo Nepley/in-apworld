@@ -474,7 +474,7 @@ class TouhouContext(CommonContext):
 							self.handler.giveBombs()
 
 						currentLives = self.handler.getCurrentLives()
-				elif(gameMode in IN_MENU):
+				elif(gameMode != IN_GAME):
 					# We enter in the menu
 					if(currentMode != 1):
 						self.handler.resetStageVariables()
@@ -506,7 +506,7 @@ class TouhouContext(CommonContext):
 				if game_mode == -2:
 					continue
 
-				if game_mode in IN_MENU:
+				if game_mode != IN_GAME:
 					try:
 						menu = self.handler.getMenu()
 					except Exception as e:
