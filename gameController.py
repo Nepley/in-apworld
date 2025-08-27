@@ -102,8 +102,8 @@ class gameController:
 	addrSoundHack2 = None
 
 	# Difficulty
-	addrDifficultyDown = None
-	addrDifficultyUp = None
+	addrMinimumCursorDown = None
+	addrMinimumCursorUp = None
 	addrDifficultyCondition = None
 	addrLastDifficulty = None
 	addrDefaultDifficulty1 = None
@@ -164,7 +164,7 @@ class gameController:
 		self.addrInput = self.pm.base_address+ADDR_INPUT
 		self.addrGameMode = self.pm.base_address+ADDR_GAME_MODE
 		self.addrMenu = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU[0], ADDR_MENU[1:])
-		self.addrMenuCursor =  getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
+		self.addrMenuCursor = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
 		self.addrIsBossPresent1 = self.pm.base_address+ADDR_IS_BOSS_PRESENT_1
 		self.addrIsBossPresent2 = self.pm.base_address+ADDR_IS_BOSS_PRESENT_2
 		self.addrDemoCondition = self.pm.base_address+ADDR_DEMO_CONDITION
@@ -198,8 +198,8 @@ class gameController:
 		self.addrFpsText = self.pm.base_address+ADDR_FPS_TEXT
 		self.addrFpsUpdate = self.pm.base_address+ADDR_FPS_UPDATE
 
-		self.addrDifficultyDown = self.pm.base_address+ADDR_DIFFICULTY_DOWN
-		self.addrDifficultyUp = self.pm.base_address+ADDR_DIFFICULTY_UP
+		self.addrMinimumCursorDown = self.pm.base_address+ADDR_MINIMUM_CURSOR_DOWN
+		self.addrMinimumCursorUp = self.pm.base_address+ADDR_MINIMUM_CURSOR_UP
 		self.addrDifficultyCondition = self.pm.base_address+ADDR_DIFFICULTY_CONDITION
 		self.addrDifficultyCursorDefault = [self.pm.base_address+ADDR_DIFFICULTY_CURSOR_DEFAULT[0], self.pm.base_address+ADDR_DIFFICULTY_CURSOR_DEFAULT[1], self.pm.base_address+ADDR_DIFFICULTY_CURSOR_DEFAULT[2]]
 
@@ -444,7 +444,12 @@ class gameController:
 		return int.from_bytes(self.pm.read_bytes(self.addrIllusionLunatic, 1))
 
 	def getIllusionExtra(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrIllusionExtra, 1))
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionExtra[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionExtra[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionExtra[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionExtra[3], 1))
+			]
 
 	def getMagicEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrMagicEasy, 1))
@@ -459,22 +464,32 @@ class gameController:
 		return int.from_bytes(self.pm.read_bytes(self.addrMagicLunatic, 1))
 
 	def getMagicExtra(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrMagicExtra, 1))
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrMagicExtra[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrMagicExtra[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrMagicExtra[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrMagicExtra[3], 1))
+			]
 
-	def getMagicEasy(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrMagicEasy, 1))
+	def getDevilEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrDevilEasy, 1))
 
-	def getMagicNormal(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrMagicNormal, 1))
+	def getDevilNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrDevilNormal, 1))
 
-	def getMagicHard(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrMagicHard, 1))
+	def getDevilHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrDevilHard, 1))
 
-	def getMagicLunatic(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrMagicLunatic, 1))
+	def getDevilLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrDevilLunatic, 1))
 
-	def getMagicExtra(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrMagicExtra, 1))
+	def getDevilExtra(self):
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrDevilExtra[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrDevilExtra[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrDevilExtra[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrDevilExtra[3], 1))
+			]
 
 	def getNetherEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrNetherEasy, 1))
@@ -489,7 +504,12 @@ class gameController:
 		return int.from_bytes(self.pm.read_bytes(self.addrNetherLunatic, 1))
 
 	def getNetherExtra(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrNetherExtra, 1))
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrNetherExtra[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrNetherExtra[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrNetherExtra[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrNetherExtra[3], 1))
+			]
 
 	def getInput(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrInput, 1))
@@ -503,10 +523,16 @@ class gameController:
 		return mode
 
 	def getMenu(self):
-		self.addrMenu = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU[0], ADDR_MENU[1:])
-		return int.from_bytes(self.pm.read_bytes(self.addrMenu, 1))
+		try:
+			self.addrMenu = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU[0], ADDR_MENU[1:])
+			menu = int.from_bytes(self.pm.read_bytes(self.addrMenu, 1))
+		except pymem.exception.MemoryReadError as e:
+			menu = -1
+
+		return menu
 
 	def getMenuCursor(self):
+		self.addrMenuCursor = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
 		return int.from_bytes(self.pm.read_bytes(self.addrMenuCursor, 1))
 
 	def getNormalSpeed(self):
@@ -537,16 +563,66 @@ class gameController:
 	def getPracticeStageScore(self, characterId, difficultyId, stageId):
 		return int.from_bytes(self.pm.read_bytes(self.addrPracticeScore[characterId][difficultyId][stageId], 4))
 
-	def getDifficultyDown(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrDifficultyDown, 1))
+	def getMinimumCursorDown(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMinimumCursorDown, 1))
 
-	def getDifficultyUp(self):
-		return int.from_bytes(self.pm.read_bytes(self.addrDifficultyUp, 1))
+	def getMinimumCursorUp(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMinimumCursorUp, 1))
+
+	def getCharacterDifficulty(self, character, difficulty):
+		result = None
+		if character == ILLUSION_TEAM:
+			if difficulty == EASY:
+				result = self.getIllusionEasy()
+			elif difficulty == NORMAL:
+				result = self.getIllusionNormal()
+			elif difficulty == HARD:
+				result = self.getIllusionHard()
+			elif difficulty == LUNATIC:
+				result = self.getIllusionLunatic()
+			elif difficulty == EXTRA:
+				result = self.getIllusionExtra()
+		elif character == MAGIC_TEAM:
+			if difficulty == EASY:
+				result = self.getMagicEasy()
+			elif difficulty == NORMAL:
+				result = self.getMagicNormal()
+			elif difficulty == HARD:
+				result = self.getMagicHard()
+			elif difficulty == LUNATIC:
+				result = self.getMagicLunatic()
+			elif difficulty == EXTRA:
+				result = self.getMagicExtra()
+		elif character == DEVIL_TEAM:
+			if difficulty == EASY:
+				result = self.getDevilEasy()
+			elif difficulty == NORMAL:
+				result = self.getDevilNormal()
+			elif difficulty == HARD:
+				result = self.getDevilHard()
+			elif difficulty == LUNATIC:
+				result = self.getDevilLunatic()
+			elif difficulty == EXTRA:
+				result = self.getDevilExtra()
+		elif character == NETHER_TEAM:
+			if difficulty == EASY:
+				result = self.getNetherEasy()
+			elif difficulty == NORMAL:
+				result = self.getNetherNormal()
+			elif difficulty == HARD:
+				result = self.getNetherHard()
+			elif difficulty == LUNATIC:
+				result = self.getNetherLunatic()
+			elif difficulty == EXTRA:
+				result = self.getNetherExtra()
+
+		return result
 
 	def getFpsText(self):
 		return self.pm.read_bytes(self.addrFpsText, 8)
 
 	def setMenuCursor(self, newCursor):
+		self.addrMenuCursor = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
 		self.pm.write_bytes(self.addrMenuCursor, bytes([newCursor]), 1)
 
 	def setStage(self, newStage):
@@ -720,11 +796,11 @@ class gameController:
 	def setInput(self, newInput):
 		self.pm.write_bytes(self.addrInput, bytes([newInput]), 1)
 
-	def setDifficultyDown(self, difficultyDown):
-		self.pm.write_bytes(self.addrDifficultyDown, bytes([difficultyDown]), 1)
+	def setMinimumCursorDown(self, minimumCursorDown):
+		self.pm.write_bytes(self.addrMinimumCursorDown, bytes([minimumCursorDown]), 1)
 
-	def setDifficultyUp(self, difficultyUp):
-		self.pm.write_bytes(self.addrDifficultyUp, bytes([difficultyUp]), 1)
+	def setMinimumCursorUp(self, minimumCursorUp):
+		self.pm.write_bytes(self.addrMinimumCursorUp, bytes([minimumCursorUp]), 1)
 
 	def setDefaultExtraDifficulty(self, cursor):
 		self.pm.write_bytes(self.addrDefaultExtraDifficulty, bytes([cursor]), 1)

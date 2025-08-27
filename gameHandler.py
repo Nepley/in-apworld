@@ -80,7 +80,7 @@ class gameHandler:
 				difficulty = location_data[3]
 
 				# If it's not the Extra
-				if stage < 9:
+				if stage < 8:
 					if difficulty >= 0:
 						scores[character][difficulty][stage][counter] += 1
 					else:
@@ -217,6 +217,9 @@ class gameHandler:
 
 		return can
 
+	def getCharactersState(self):
+		return self.characters
+
 	#
 	# Get Games Functions
 	#
@@ -261,6 +264,9 @@ class gameHandler:
 
 	def getCurrentContinues(self):
 		return self.gameController.getContinues()
+
+	def getCursorPosition(self):
+		return self.gameController.getMenuCursor()
 
 	#
 	# Set Items Functions
@@ -500,14 +506,14 @@ class gameHandler:
 		"""
 		Update the minimum cursor position value authorized.
 		If -1, it will be the lowest difficulty.
-		If -2, it will lock to 1 if the Extra Stage is not unlocked by any character. (For Phantasm select)
+		If -2, it will lock to 1 if the Extra Stage is not unlocked by any character.
 		"""
 		if minValue == -2:
 			minValue = 1 if not self.canExtra() else 0
 		else:
 			minValue = self.getLowestDifficulty() if minValue == -1 else minValue
-		self.gameController.setDifficultyDown(minValue)
-		self.gameController.setDifficultyUp(minValue)
+		self.gameController.setMinimumCursorDown(minValue)
+		self.gameController.setMinimumCursorUp(minValue)
 
 		# If the cursor is "out of bounds", we set it to the minimum value authorized
 		if self.gameController.getMenuCursor() < minValue:

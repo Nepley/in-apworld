@@ -4,8 +4,10 @@ import colorama
 import time
 import random
 from .gameHandler import *
+from .GuardRail import *
 from .Tools import *
 from .Mapping import *
+import traceback
 
 from CommonClient import (
 	CommonContext,
@@ -280,7 +282,7 @@ class TouhouContext(CommonContext):
 				case 506: # Power Point Drain
 					self.traps["power_point_drain"] += 1
 				case _:
-					print(f"Unknown Item: {item}")
+					logger.error(f"Unknown Item: {item}")
 
 		if gotAnyItem:
 			self.handler.playSound(0x19)
@@ -483,7 +485,8 @@ class TouhouContext(CommonContext):
 						noCheck = False # We enable the checks once we're in the menu
 					self.updateStageList()
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Main ERROR:")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def menu_loop(self):
@@ -507,21 +510,21 @@ class TouhouContext(CommonContext):
 					continue
 
 				if game_mode != IN_GAME:
-					try:
-						menu = self.handler.getMenu()
-					except Exception as e:
+					menu = self.handler.getMenu()
+					if menu == -1:
 						continue
+
 					# We check where we are in the menu in order to determine how we lock/unlock the characters
-					if menu in [0, 12]  or self.handler.getDifficulty() == EXTRA:
+					if (menu == MAIN_MENU or menu in EXTRA_MENU) or self.handler.getDifficulty() == EXTRA:
 						self.ExtraMenu = True
-					elif menu in [4, 8] or self.handler.getDifficulty() < EXTRA:
+					elif (menu in NORMAL_MENU or menu in PRACTICE_MENU) or self.handler.getDifficulty() < EXTRA:
 						self.ExtraMenu = False
 
 					# If we're in the difficulty menu, we put the minimal value to the lowest difficulty
-					if menu in [4, 8]:
+					if menu in [NORMAL_DIFFICULTY_MENU, PRACTICE_DIFFICULTY_MENU]:
 						self.minimalCursor = -1
 					# If we're in the main menu and we play in practice mode, we lock the access to normal mode
-					elif menu == 0 and mode == PRACTICE_MODE:
+					elif menu == MAIN_MENU and mode == PRACTICE_MODE:
 						# 1 If we have access to the extra stage, 2 if we don't
 						self.minimalCursor = 1 if self.handler.canExtra() else 3
 					else:
@@ -533,7 +536,8 @@ class TouhouContext(CommonContext):
 					except Exception as e:
 						pass
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Menu ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def trap_loop(self):
@@ -649,7 +653,8 @@ class TouhouContext(CommonContext):
 					restarted = False
 					currentScore = 0
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Trap ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def death_link_loop(self):
@@ -698,7 +703,8 @@ class TouhouContext(CommonContext):
 				else:
 					inLevel = False
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"DeathLink ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def message_loop(self):
@@ -715,7 +721,8 @@ class TouhouContext(CommonContext):
 				else:
 					await asyncio.sleep(0.1)
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"Message ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
 
 	async def ring_link_loop(self):
@@ -754,8 +761,32 @@ class TouhouContext(CommonContext):
 					self.last_power_point = -1
 					self.timer = 0.5
 		except Exception as e:
-			print(f"ERROR: {e}")
+			logger.error(f"RingLink ERROR: {e}")
+			logger.error(traceback.format_exc())
 			self.inError = True
+
+	async def guard_rail_loop(self):
+		"""
+		Loop that handles the guard rail
+		"""
+		guard_rail = GuardRail(self.handler.gameController, self.handler)
+		while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			try:
+				await asyncio.sleep(2)
+				result = guard_rail.check_memory_addresses()
+				if result["error"]:
+					logger.error(f"Memory ERROR: {result['message']}")
+
+				result = guard_rail.check_cursor_state()
+				if result["error"]:
+					logger.error(f"Cursor State ERROR: {result['message']}")
+
+				result = guard_rail.check_menu_lock()
+				if result["error"]:
+					logger.error(f"Menu Lock ERROR: {result['message']}")
+			except Exception as e:
+				logger.error(f"GuardRail ERROR: {e}")
+				logger.error(traceback.format_exc())
 
 	async def connect_to_game(self):
 		"""
@@ -803,7 +834,7 @@ async def game_watcher(ctx: TouhouContext):
 			asyncio.create_task(ctx.connect_to_game())
 			while(ctx.handler is None and not ctx.exit_event.is_set()):
 				await asyncio.sleep(1)
-			
+
 		# Connection following an error
 		if ctx.inError:
 			logger.info(f"Connection lost. Waiting for connection to {SHORT_NAME}...")
@@ -821,6 +852,7 @@ async def game_watcher(ctx: TouhouContext):
 			asyncio.create_task(ctx.menu_loop())
 			asyncio.create_task(ctx.trap_loop())
 			asyncio.create_task(ctx.message_loop())
+			asyncio.create_task(ctx.guard_rail_loop())
 
 			# We update the locations checked if there was any location that was already checked before the connection
 			await ctx.update_locations_checked()
