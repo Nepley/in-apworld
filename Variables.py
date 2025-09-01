@@ -12,6 +12,8 @@ DEVIL_TEAM = 2
 NETHER_TEAM = 3
 CHARACTERS = [ILLUSION_TEAM, MAGIC_TEAM, DEVIL_TEAM, NETHER_TEAM]
 CHARACTER_NAME_TO_ID = {"Illusion Team": ILLUSION_TEAM, "Magic Team": MAGIC_TEAM, "Devil Team": DEVIL_TEAM, "Nether Team": NETHER_TEAM}
+STAGE_4A_TEAM = [MAGIC_TEAM, NETHER_TEAM, "Magic Team", "Nether Team"]
+STAGE_4B_TEAM = [ILLUSION_TEAM, DEVIL_TEAM, "Illusion Team", "Devil Team"]
 
 EASY = 0
 NORMAL = 1
@@ -75,6 +77,12 @@ CHARACTER_TO_ITEM = {
 	"Magic Team": ["Aria of Forbidden Magic Team"],
 	"Devil Team": ["Visionary Scarlet Devil Team"],
 	"Nether Team": ["Netherworld Dwellers Team"],
+}
+ITEM_TO_CHARACTER = {
+	"Illusionary Barrier Team": "Illusion Team",
+	"Aria of Forbidden Magic Team": "Magic Team",
+	"Visionary Scarlet Devil Team": "Devil Team",
+	"Netherworld Dwellers Team": "Nether Team",
 }
 DIFFICULTY_LIST = ["Easy", "Normal", "Hard", "Lunatic"]
 EXTRA_CHECKS = ["Keine - MidBoss 2", "Mokou Defeated"]

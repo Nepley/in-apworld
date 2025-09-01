@@ -35,14 +35,17 @@ class TWorld(World):
 	def create_items(self):
 		item_pool: List[TItem] = []
 		character_list = []
+		progressive_stage_list = []
 		stages = []
 		extra_stages = []
 		total_locations = len(self.multiworld.get_unfilled_locations(self.player))
 		number_placed_item = 0
 		mode = getattr(self.options, "mode")
 		stage_unlock = getattr(self.options, "stage_unlock")
+		progressive_stage = getattr(self.options, "progressive_stage")
 		exclude_lunatic = getattr(self.options, "exclude_lunatic")
 		extra = getattr(self.options, "extra_stage")
+		both_stage_4 = getattr(self.options, "both_stage_4")
 		goal = getattr(self.options, "goal")
 		traps = getattr(self.options, "traps")
 		power_point_trap = getattr(self.options, "power_point_trap")
@@ -69,7 +72,12 @@ class TWorld(World):
 				continue
 
 			# Will be added later
-			if data.category in ["[Global] Stages", "[Character] Stages"]:
+			if data.category in ["[Progressive][Global] Stages", "[Progressive][Character] Stages"]:
+				progressive_stage_list.append({"name": name, "data": data})
+				continue
+
+			# Will be added later
+			if data.category in ["[Not Progressive][Global] Stages", "[Not Progressive][Character] Stages"]:
 				stages.append({"name": name, "data": data})
 				continue
 
@@ -93,19 +101,47 @@ class TWorld(World):
 
 			item_pool += [self.create_item(name) for _ in range(0, quantity)]
 
+		# Selecting starting character
+		starting_character = self.random.choice(character_list)
+		self.multiworld.push_precollected(self.create_item(starting_character))
+		character_list.remove(starting_character)
+		for character in character_list:
+			item_pool += [self.create_item(character) for _ in range(0, 1)]
+
 		# Stages
 		if mode == PRACTICE_MODE:
-			for stage in stages:
-				quantity = stage['data'].max_quantity
-				# If there is no extra stage or it's separated, we remove one stage
-				if extra != EXTRA_LINEAR:
-					quantity -= 1
+			if progressive_stage:
+				for stage in progressive_stage_list:
+					quantity = stage['data'].max_quantity
+					# If there is no extra stage or it's separated, we remove one stage
+					if extra != EXTRA_LINEAR:
+						quantity -= 1
 
-				if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Global] Stages":
-					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+					# If there is only one stage 4, we remove one stage
+					if not both_stage_4:
+						quantity -= 1
 
-				if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Character] Stages":
-					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+					if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Progressive][Global] Stages":
+						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Progressive][Character] Stages":
+						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+			else:
+				for stage in stages:
+					quantity = stage['data'].max_quantity
+
+					if not both_stage_4 and stage["name"] in ["[Illusion Team] Stage 4A", "[Magic Team] Stage 4B", "[Devil Team] Stage 4A", "[Nether Team] Stage 4B"]:
+						continue
+
+					if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Not Progressive][Global] Stages":
+						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Not Progressive][Character] Stages":
+						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+				# If Extra is enabled linearly, we change it to apart
+				if extra == EXTRA_LINEAR:
+					extra = EXTRA_APART
 
 		# Extra
 		if extra == EXTRA_APART:
@@ -118,14 +154,11 @@ class TWorld(World):
 				if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Character] Extra Stage":
 					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
 
-		# Selecting starting character
-		chosen = self.random.choice(character_list)
-		self.multiworld.push_precollected(self.create_item(chosen))
-		character_list.remove(chosen)
-		for character in character_list:
-			item_pool += [self.create_item(character) for _ in range(0, 1)]
-
 		# Creating and placing Endings
+		ending_final_a_illusion = self.create_item("[Illusion Team] Ending - Eirin")
+		ending_final_a_magic = self.create_item("[Magic Team] Ending - Eirin")
+		ending_final_a_devil = self.create_item("[Devil Team] Ending - Eirin")
+		ending_final_a_nether = self.create_item("[Nether Team] Ending - Eirin")
 		ending_final_b_illusion = self.create_item("[Illusion Team] Ending - Kaguya")
 		ending_final_b_magic = self.create_item("[Magic Team] Ending - Kaguya")
 		ending_final_b_devil = self.create_item("[Devil Team] Ending - Kaguya")
@@ -136,14 +169,22 @@ class TWorld(World):
 		ending_extra_nether = self.create_item("[Nether Team] Ending - Mokou")
 
 		# If we have the extra stage and the extra boss is a potential goal
-		if extra and goal not in [ENDING_FINAL_B]:
+		if extra and goal in [ENDING_EXTRA, ENDING_ALL]:
 				self.multiworld.get_location("[Illusion Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_illusion)
 				self.multiworld.get_location("[Magic Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_magic)
 				self.multiworld.get_location("[Devil Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_devil)
 				self.multiworld.get_location("[Nether Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_nether)
 				number_placed_item += 4
 
-		# If the final boss is a potential goal
+		# If Eirin boss is a potential goal
+		if goal in [ENDING_FINAL_A, ENDING_ALL]:
+				self.multiworld.get_location("[Illusion Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_illusion)
+				self.multiworld.get_location("[Magic Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_magic)
+				self.multiworld.get_location("[Devil Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_devil)
+				self.multiworld.get_location("[Nether Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_nether)
+				number_placed_item += 4
+
+		# If Kaguya boss is a potential goal
 		if (not extra and goal == ENDING_EXTRA) or goal in [ENDING_FINAL_B, ENDING_ALL]:
 				self.multiworld.get_location("[Illusion Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_illusion)
 				self.multiworld.get_location("[Magic Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_magic)

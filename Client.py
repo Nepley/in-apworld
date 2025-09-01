@@ -4,7 +4,7 @@ import colorama
 import time
 import random
 from .gameHandler import *
-from .GuardRail import *
+from .guardRail import *
 from .Tools import *
 from .Mapping import *
 import traceback
@@ -189,59 +189,239 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 200: # Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear)
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, -1, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 201: # [Illusion] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, ILLUSION_TEAM)
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, ILLUSION_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 202: # [Magic] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, MAGIC_TEAM)
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, MAGIC_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 203: # [Devil] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, DEVIL_TEAM)
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, DEVIL_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 204: # [Nether] Next Stage
 					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
-					self.handler.addStage(isExtraStageLinear, NETHER_TEAM)
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, NETHER_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 205: # Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart:
+					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage()
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 206: # [Illusion] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart:
+					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(ILLUSION_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 207: # [Magic] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart:
+					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(MAGIC_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 208: # [Devil] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart:
+					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(DEVIL_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 209: # [Nether] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart:
+					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(NETHER_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 210: # Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, -1, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 211: # Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, -1, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 212: # Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, -1, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 213: # Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, -1, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 214: # Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, -1, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 215: # Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, -1, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 216: # Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, -1, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 217: # [Illusion Team] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, ILLUSION_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 218: # [Illusion Team] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, ILLUSION_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 219: # [Illusion Team] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, ILLUSION_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 220: # [Illusion Team] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, ILLUSION_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 221: # [Illusion Team] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, ILLUSION_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 222: # [Illusion Team] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, ILLUSION_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 223: # [Illusion Team] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, ILLUSION_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 224: # [Magic Team] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, MAGIC_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 225: # [Magic Team] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, MAGIC_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 226: # [Magic Team] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, MAGIC_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 227: # [Magic Team] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, MAGIC_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 228: # [Magic Team] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, MAGIC_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 229: # [Magic Team] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, MAGIC_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 230: # [Magic Team] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, MAGIC_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 231: # [Devil Team] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, DEVIL_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 232: # [Devil Team] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, DEVIL_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 233: # [Devil Team] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, DEVIL_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 234: # [Devil Team] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, DEVIL_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 235: # [Devil Team] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, DEVIL_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 236: # [Devil Team] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, DEVIL_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 237: # [Devil Team] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, DEVIL_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 238: # [Nether Team] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, NETHER_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 239: # [Nether Team] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, NETHER_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 240: # [Nether Team] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, NETHER_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 241: # [Nether Team] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, NETHER_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 242: # [Nether Team] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, NETHER_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 243: # [Nether Team] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, NETHER_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 244: # [Nether Team] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, NETHER_TEAM, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 300 | 301 | 302 | 303: # Ending - Eirin
 					character = ILLUSION_TEAM if item_id == 300 else (MAGIC_TEAM if item_id == 301 else (DEVIL_TEAM if item_id == 302 else NETHER_TEAM))
 					self.handler.addEnding(character, ENDING_FINAL_A)
@@ -372,17 +552,27 @@ class TouhouContext(CommonContext):
 		type = self.options['ending_required']
 		extra = self.options['extra_stage']
 
-		normal_victory = True
+		normal_a_victory = True
+		normal_b_victory = True
 		extra_victory = True
 
-		if (goal == ENDING_FINAL_B or goal == ENDING_ALL) or (extra == NO_EXTRA):
+		if (goal == ENDING_FINAL_A or goal == ENDING_ALL):
 			if type == ONE_ENDING:
-				normal_victory = False
+				normal_a_victory = False
 				for character in CHARACTERS:
-					normal_victory = normal_victory or self.handler.endings[character][ENDING_FINAL_B]
+					normal_a_victory = normal_a_victory or self.handler.endings[character][ENDING_FINAL_A]
 			elif type == ALL_CHARACTER_ENDING:
 				for character in CHARACTERS:
-					normal_victory = normal_victory and self.handler.endings[character][ENDING_FINAL_B]
+					normal_a_victory = normal_a_victory and self.handler.endings[character][ENDING_FINAL_A]
+
+		if (goal == ENDING_FINAL_B or goal == ENDING_ALL) or (extra == NO_EXTRA and goal == ENDING_EXTRA):
+			if type == ONE_ENDING:
+				normal_b_victory = False
+				for character in CHARACTERS:
+					normal_b_victory = normal_b_victory or self.handler.endings[character][ENDING_FINAL_B]
+			elif type == ALL_CHARACTER_ENDING:
+				for character in CHARACTERS:
+					normal_b_victory = normal_b_victory and self.handler.endings[character][ENDING_FINAL_B]
 
 		if (goal == ENDING_EXTRA or goal == ENDING_ALL) and extra != NO_EXTRA:
 			if type == ONE_ENDING:
@@ -393,7 +583,7 @@ class TouhouContext(CommonContext):
 				for character in CHARACTERS:
 					extra_victory = extra_victory and self.handler.endings[character][ENDING_EXTRA]
 
-		return normal_victory and extra_victory
+		return normal_a_victory and normal_b_victory and extra_victory
 
 	async def main_loop(self):
 		"""

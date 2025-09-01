@@ -267,6 +267,9 @@ class gameHandler:
 
 	def getCursorPosition(self):
 		return self.gameController.getMenuCursor()
+	
+	def getCurrentCharacter(self):
+		return self.gameController.getCharacter()
 
 	#
 	# Set Items Functions
@@ -314,19 +317,28 @@ class gameHandler:
 			else:
 				self.gameController.setPower(128)
 
-	def addStage(self, extra = False, character = -1):
+	def addProgressiveStage(self, extra = False, character = -1, both_stage_4 = True):
 		character_list = [character] if character > -1 else CHARACTERS
 
 		for character in character_list:
 			no_new_stage = True
 			for i in range(len(self.stages[character])):
 				if self.stages[character][i] == 0:
-					self.stages[character][i] = 1
-					no_new_stage = False
-					break
+					if i not in [3, 4] or both_stage_4 or (i == 3 and character in STAGE_4A_TEAM) or (i == 4 and character in STAGE_4B_TEAM):
+						self.stages[character][i] = 1
+						no_new_stage = False
+						break
 
 			if(no_new_stage and extra):
 				self.unlockExtraStage(character)
+
+	def addStage(self, stage, character = -1, both_stage_4 = True):
+		character_list = [character] if character > -1 else CHARACTERS
+
+		for character in character_list:
+			if self.stages[character][stage] == 0:
+				if stage not in [3, 4] or both_stage_4 or (stage == 3 and character in STAGE_4A_TEAM) or (stage == 4 and character in STAGE_4B_TEAM):
+					self.stages[character][stage] = 1
 
 	def addContinue(self):
 		if(self.continues < 3):

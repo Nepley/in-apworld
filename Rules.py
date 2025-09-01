@@ -2,7 +2,7 @@ from BaseClasses import MultiWorld
 from .Variables import *
 from .Regions import get_regions
 
-def constructStageRule(player, state, nb_stage, mode, difficulty, character_list):
+def constructProgressiveStageRule(player, state, nb_stage, mode, difficulty, character_list):
 	rule = state.count("Lower Difficulty", player) >= difficulty
 	stage_rule = False
 	if mode not in NORMAL_MODE:
@@ -16,8 +16,29 @@ def constructStageRule(player, state, nb_stage, mode, difficulty, character_list
 
 	return rule and stage_rule
 
-def makeStageRule(player, nb_stage, mode, difficulty, character_list):
-	return lambda state: constructStageRule(player, state, nb_stage, mode, difficulty, character_list)
+def constructStageRule(player, state, stage, mode, difficulty, character_list):
+	rule = state.count("Lower Difficulty", player) >= difficulty
+	stage_rule = False
+	if mode not in NORMAL_MODE:
+		if character_list:
+			for character in character_list:
+				if stage != "Stage 1":
+					stage_rule = stage_rule or (state.has(f"[{character}] {stage}", player) and state.has_any(CHARACTER_TO_ITEM[character], player))
+				else:
+					stage_rule = stage_rule or (state.has_any(CHARACTER_TO_ITEM[character], player))
+		else:
+			if stage != "Stage 1":
+				stage_rule = state.has(f"{stage}", player)
+	else:
+		stage_rule = True
+
+	return rule and stage_rule
+
+def makeStageRule(player, nb_stage, mode, difficulty, character_list, progressive_stage):
+	if progressive_stage:
+		return lambda state: constructProgressiveStageRule(player, state, nb_stage, mode, difficulty, character_list)
+	else:
+		return lambda state: constructStageRule(player, state, nb_stage, mode, difficulty, character_list)
 
 def makeResourcesRule(player, lives, bombs, difficulties):
 	return lambda state: state.count("+1 Life", player) >= lives and state.count("+1 Bomb", player) >= bombs and state.count("Lower Difficulty", player) >= difficulties
@@ -51,19 +72,30 @@ def makeCharacterRule(player, characters):
 def addDifficultyRule(player, difficulty, rule):
 	return lambda state: state.count("Lower Difficulty", player) >= difficulty and rule(state)
 
-def victoryCondition(player, state, normal, extra, type):
-	normal_victory = True
+def victoryCondition(player, state, normal_a, normal_b, extra, type):
+	normal_a_victory = True
+	normal_b_victory = True
 	extra_victory = True
 
-	if normal:
+	if normal_a:
+		endings = []
+		for character in CHARACTERS_LIST:
+			endings.append(f"[{character}] {ENDING_FINAL_A_ITEM}")
+
+		if type == ONE_ENDING:
+			normal_a_victory = state.has_any(endings, player)
+		elif type == ALL_CHARACTER_ENDING:
+			normal_a_victory = state.has_all(endings, player)
+
+	if normal_b:
 		endings = []
 		for character in CHARACTERS_LIST:
 			endings.append(f"[{character}] {ENDING_FINAL_B_ITEM}")
 
 		if type == ONE_ENDING:
-			normal_victory = state.has_any(endings, player)
+			normal_b_victory = state.has_any(endings, player)
 		elif type == ALL_CHARACTER_ENDING:
-			normal_victory = state.has_all(endings, player)
+			normal_b_victory = state.has_all(endings, player)
 
 	if extra:
 		endings = []
@@ -75,7 +107,7 @@ def victoryCondition(player, state, normal, extra, type):
 		elif type == ALL_CHARACTER_ENDING:
 			extra_victory = state.has_all(endings, player)
 
-	return normal_victory and extra_victory
+	return normal_a_victory and normal_b_victory and extra_victory
 
 def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: list, rule=None):
 	lifeMid = getattr(multiworld.worlds[player].options, "number_life_mid")
@@ -90,7 +122,9 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 	extra = getattr(multiworld.worlds[player].options, "extra_stage")
 	difficulty_check = getattr(multiworld.worlds[player].options, "difficulty_check")
 	stage_unlock = getattr(multiworld.worlds[player].options, "stage_unlock")
+	progressive_stage = getattr(multiworld.worlds[player].options, "progressive_stage")
 	exclude_lunatic = getattr(multiworld.worlds[player].options, "exclude_lunatic")
+	both_stage_4 = getattr(multiworld.worlds[player].options, "both_stage_4")
 
 	for exit in exits:
 		rule = None
@@ -105,18 +139,24 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 			rule = makeResourcesRule(player, lifeExtra, bombsExtra, 0)
 		elif "Stage" in exit:
 			if "Extra" not in exit:
-				if "4A" in exit:
-					level = 3
-				elif "4B" in exit:
-					level = 4
-				elif "5" in exit:
-					level = 5
-				elif "6A" in exit:
-					level = 6
-				elif "6B" in exit:
-					level = 7
+				if progressive_stage:
+					if "4A" in exit:
+						level = 3
+					elif "4B" in exit:
+						level = 4
+					elif "5" in exit:
+						level = 5
+					elif "6A" in exit:
+						level = 6
+					elif "6B" in exit:
+						level = 7
+					else:
+						level = int(exit[-1])-1
+
+					if level >= 4 and not both_stage_4:
+						level -= 1
 				else:
-					level = int(exit[-1])-1
+					level = exit.split("] ")[1]
 
 				difficulty_value = 0
 				if difficulty_check in DIFFICULTY_CHECK:
@@ -139,7 +179,7 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 								character_value = [character]
 								break
 
-				rule = makeStageRule(player, level, mode, difficulty_value, character_value)
+				rule = makeStageRule(player, level, mode, difficulty_value, character_value, progressive_stage)
 			else:
 				# If we don't have global stage unlock, we retrieve the character from the source region
 				character_value = []
@@ -149,6 +189,10 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 							if character in source:
 								character_value = [character]
 								break
+
+				# If Extra is enabled linearly, we change it to apart
+				if extra == EXTRA_LINEAR and mode == PRACTICE_MODE and not progressive_stage:
+					extra = EXTRA_APART
 
 				if "Extra" in exit:
 					rule = makeExtraRule(player, character_value, mode, extra)
@@ -166,9 +210,10 @@ def set_rules(multiworld: MultiWorld, player: int):
 	endingRequired = getattr(multiworld.worlds[player].options, "ending_required")
 	goal = getattr(multiworld.worlds[player].options, "goal")
 	exclude_lunatic = getattr(multiworld.worlds[player].options, "exclude_lunatic")
+	both_stage_4 = getattr(multiworld.worlds[player].options, "both_stage_4")
 
 	# Regions
-	regions = get_regions(difficulty_check, extra, exclude_lunatic)
+	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4)
 
 	for name, data in regions.items():
 		if data["exits"]:
@@ -181,4 +226,4 @@ def set_rules(multiworld: MultiWorld, player: int):
 		goal = ENDING_FINAL_B_ITEM
 
 	# Win condition.
-	multiworld.completion_condition[player] = lambda state: victoryCondition(player, state, (goal in [ENDING_FINAL_B, ENDING_ALL]), (goal in [ENDING_EXTRA, ENDING_ALL] and extra != NO_EXTRA), endingRequired)
+	multiworld.completion_condition[player] = lambda state: victoryCondition(player, state, (goal in [ENDING_FINAL_A, ENDING_ALL]), (goal in [ENDING_FINAL_B, ENDING_ALL]), (goal in [ENDING_EXTRA, ENDING_ALL] and extra != NO_EXTRA), endingRequired)

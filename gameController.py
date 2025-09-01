@@ -744,7 +744,7 @@ class gameController:
 		# If we have less than 8 character, we pad space character
 		if len(newFpsText) < 8:
 			for char in range(0, (8-len(newFpsText))):
-				newFpsText.insert(0, 0x9D)
+				newFpsText.insert(0, 0x60)
 		self.pm.write_bytes(self.addrFpsText, bytes(newFpsText), 8)
 
 	def setCharacterDifficulty(self, character, difficulty, newValue):

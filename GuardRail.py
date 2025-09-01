@@ -75,16 +75,21 @@ class GuardRail:
 				if menu in [NORMAL_CHARACTER_MENU, PRACTICE_CHARACTER_MENU, EXTRA_CHARACTER_MENU]:
 					characters = self.game_handler.getCharactersState()
 					if not characters[cursor]:
-						# If the cursor is on a locked character, we need to handle it
 						result["error"] = True
 						result["message"] = f"Character {cursor} is locked."
 				# If we're in the difficulty select, we check if the cursor is on a difficulty that is unlocked
 				elif menu in [NORMAL_DIFFICULTY_MENU, PRACTICE_DIFFICULTY_MENU]:
 					lowest_difficulty = self.game_handler.getLowestDifficulty()
 					if cursor < lowest_difficulty:
-						# If the cursor is on a locked difficulty, we need to handle it
 						result["error"] = True
 						result["message"] = f"Difficulty {cursor} is locked."
+				# If we're in the stage select screen, we check if the cursor is on a stage that is unlocked
+				elif menu == PRACTICE_STAGE_SELECT_MENU:
+					characters = self.game_handler.getCurrentCharacter()
+					stages = self.game_handler.stages[characters]
+					if stages[cursor] == 0:
+						result["error"] = True
+						result["message"] = f"Stage {cursor} is locked."
 
 		return result
 

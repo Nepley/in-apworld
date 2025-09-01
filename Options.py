@@ -23,6 +23,13 @@ class StageUnlock(Choice):
 	option_global = 0
 	option_by_character = 1
 
+class ProgressiveStage(Toggle):
+	"""
+	In Practice mode, determine if stages are unlocked progressively
+	"""
+	display_name = "Progressive Stage Unlock"
+	default = True
+
 class ExcludeLunatic(Toggle):
 	"""If the Lunatic difficulty is excluded"""
 	display_name = "Exclude Lunatic difficulty"
@@ -109,6 +116,13 @@ class DifficultyCheck(Choice):
 	option_false = 0
 	option_true = 1
 	option_true_with_lower = 2
+
+class BothStage4(Toggle):
+	"""
+	Determine if each team has access to the stage 4A and 4B or only the one they are assigned
+	"""
+	display_name = "Both Stage 4"
+	default = True
 
 class Goal(Choice):
 	"""If the Extra Stage is included, determine which boss is the goal."""
@@ -215,6 +229,7 @@ class PowerPointDrainTrap(Range):
 class Th08Options(PerGameCommonOptions):
 	mode: Mode
 	stage_unlock: StageUnlock
+	progressive_stage: ProgressiveStage
 	exclude_lunatic: ExcludeLunatic
 	number_life_mid: NumberLifeMid
 	number_bomb_mid: NumberBombsMid
@@ -226,6 +241,7 @@ class Th08Options(PerGameCommonOptions):
 	number_life_extra: NumberLifeExtra
 	number_bomb_extra: NumberBombsExtra
 	difficulty_check: DifficultyCheck
+	both_stage_4: BothStage4
 	goal: Goal
 	ending_required: EndingRequired
 	death_link: DeathLink
