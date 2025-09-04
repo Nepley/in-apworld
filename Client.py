@@ -279,7 +279,7 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 216: # Stage 6B
 					bothStage4 = self.options['both_stage_4']
-					self.handler.addStage(6, -1, bothStage4)
+					self.handler.addStage(7, -1, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 217: # [Illusion Team] Stage 2
@@ -314,7 +314,7 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 223: # [Illusion Team] Stage 6B
 					bothStage4 = self.options['both_stage_4']
-					self.handler.addStage(6, ILLUSION_TEAM, bothStage4)
+					self.handler.addStage(7, ILLUSION_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 224: # [Magic Team] Stage 2
@@ -349,7 +349,7 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 230: # [Magic Team] Stage 6B
 					bothStage4 = self.options['both_stage_4']
-					self.handler.addStage(6, MAGIC_TEAM, bothStage4)
+					self.handler.addStage(7, MAGIC_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 231: # [Devil Team] Stage 2
@@ -384,7 +384,7 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 237: # [Devil Team] Stage 6B
 					bothStage4 = self.options['both_stage_4']
-					self.handler.addStage(6, DEVIL_TEAM, bothStage4)
+					self.handler.addStage(7, DEVIL_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 238: # [Nether Team] Stage 2
@@ -419,7 +419,7 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 244: # [Nether Team] Stage 6B
 					bothStage4 = self.options['both_stage_4']
-					self.handler.addStage(6, NETHER_TEAM, bothStage4)
+					self.handler.addStage(7, NETHER_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 300 | 301 | 302 | 303: # Ending - Eirin

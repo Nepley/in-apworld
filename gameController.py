@@ -111,6 +111,10 @@ class gameController:
 	addrDefaultExtraDifficulty = None
 	addrDifficultyCursorDefault = None
 
+	# Stage Select
+	addrStageSelectStage4Hack1 = None
+	addrStageSelectStage4Hack2 = None
+
 	# Time
 	addrTime1 = None
 	addrTime2 = None
@@ -202,6 +206,9 @@ class gameController:
 		self.addrMinimumCursorUp = self.pm.base_address+ADDR_MINIMUM_CURSOR_UP
 		self.addrDifficultyCondition = self.pm.base_address+ADDR_DIFFICULTY_CONDITION
 		self.addrDifficultyCursorDefault = [self.pm.base_address+ADDR_DIFFICULTY_CURSOR_DEFAULT[0], self.pm.base_address+ADDR_DIFFICULTY_CURSOR_DEFAULT[1], self.pm.base_address+ADDR_DIFFICULTY_CURSOR_DEFAULT[2]]
+
+		self.addrStageSelectStage4Hack1 = self.pm.base_address+ADDR_STAGE_SELECT_STAGE_4_HACK_1
+		self.addrStageSelectStage4Hack2 = self.pm.base_address+ADDR_STAGE_SELECT_STAGE_4_HACK_2
 
 		self.addrPracticeScore = {
 			ILLUSION_TEAM:
@@ -882,6 +889,11 @@ class gameController:
 		self.pm.write_bytes(self.addrDifficultyCursorDefault[1], bytes([0x03]), 1)
 		self.pm.write_bytes(self.addrDifficultyCursorDefault[2], bytes([0x03]), 1)
 		self.pm.write_bytes(self.addrCharacterDefaultCursorCondition, bytes([0x90, 0x90, 0x90, 0x90, 0x90, 0x90]), 6)
+
+	def initStageSelectHack(self):
+		# Hack for stopping the stage 6B unlock from also unlocking both stage 4
+		self.pm.write_bytes(self.addrStageSelectStage4Hack1, bytes([0xEB]), 1)
+		self.pm.write_bytes(self.addrStageSelectStage4Hack2, bytes([0xEB]), 1)
 
 	def forceLockSoloCharacter(self):
 		self.pm.write_bytes(self.addrForceLockSoloCharacter, bytes([0xEB]), 1)

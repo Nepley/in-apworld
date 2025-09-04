@@ -442,6 +442,7 @@ class gameHandler:
 		self.gameController.setLockToAllDifficulty()
 		self.gameController.disableDemo()
 		self.gameController.forceLockSoloCharacter()
+		self.gameController.initStageSelectHack()
 
 	def reset(self):
 		"""
