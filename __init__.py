@@ -56,6 +56,10 @@ class TWorld(World):
 		freeze_trap = getattr(self.options, "freeze_trap")
 		power_point_drain_trap = getattr(self.options, "power_point_drain_trap")
 
+		# If we're in Normal mode, we force both_stage_4 to be False
+		if mode in NORMAL_MODE:
+			both_stage_4 = False
+
 		for name, data in item_table.items():
 			quantity = data.max_quantity
 

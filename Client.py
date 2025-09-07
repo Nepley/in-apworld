@@ -598,6 +598,8 @@ class TouhouContext(CommonContext):
 			noCheck = True #We start by disabling the checks since we don't know where the player would be when connecting the client
 			currentScore = 0
 			currentContinue = 0
+			currentStage = 0
+
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.5)
 				gameMode = self.handler.getGameMode()
@@ -614,6 +616,7 @@ class TouhouContext(CommonContext):
 						bossPresent = False
 						currentScore = 0
 						currentContinue = self.handler.getCurrentContinues()
+						currentStage = self.handler.getCurrentStage()
 
 						# If the current situation is technically not possible, we lock checks
 						if(not self.handler.checkIfCurrentIsPossible((self.options['mode'] in NORMAL_MODE))):
@@ -646,17 +649,23 @@ class TouhouContext(CommonContext):
 							# If the boss is defeated, we update the locations
 							if(not self.handler.isBossPresent()):
 								if(not self.handler.isCurrentBossDefeated(bossCounter)):
+									self.handler.setCurrentStageBossBeaten(bossCounter, self.otherDifficulties)
 									#If the stage is ending, we disable traps and reset the counter
 									if bossCounter == nbBoss-1:
 										self.can_trap = False
 										bossCounter = -1
-									self.handler.setCurrentStageBossBeaten(bossCounter, self.otherDifficulties)
 									await self.update_locations_checked()
 								bossPresent = False
 
 					# If we're in practice mode and a boss spawn while there is no more boss in the stage, it's not normal and we stop sending checks
 					if (self.options['mode'] == PRACTICE_MODE and bossCounter > nbBoss):
 						noCheck = True
+
+					# If the stage has changed and we're in normal mode, we reset some values
+					if currentStage != self.handler.getCurrentStage() and self.options['mode'] in NORMAL_MODE:
+						currentStage = self.handler.getCurrentStage()
+						self.can_trap = True
+						bossCounter = -1
 
 					# Death Check
 					if(currentLives != self.handler.getCurrentLives()):
@@ -959,7 +968,7 @@ class TouhouContext(CommonContext):
 		"""
 		Loop that handles the guard rail
 		"""
-		guard_rail = GuardRail(self.handler.gameController, self.handler)
+		guard_rail = GuardRail(self.handler.gameController, self.handler, self.options)
 		while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 			try:
 				await asyncio.sleep(2)

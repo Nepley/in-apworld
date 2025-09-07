@@ -29,6 +29,8 @@ def constructStageRule(player, state, stage, mode, difficulty, character_list):
 		else:
 			if stage != "Stage 1":
 				stage_rule = state.has(f"{stage}", player)
+			else:
+				stage_rule = True
 	else:
 		stage_rule = True
 
@@ -126,6 +128,10 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 	exclude_lunatic = getattr(multiworld.worlds[player].options, "exclude_lunatic")
 	both_stage_4 = getattr(multiworld.worlds[player].options, "both_stage_4")
 
+	# If we're in Normal mode, we force both_stage_4 to be False
+	if mode in NORMAL_MODE:
+		both_stage_4 = False
+
 	for exit in exits:
 		rule = None
 		# Rules depend on the name of the target region
@@ -211,6 +217,11 @@ def set_rules(multiworld: MultiWorld, player: int):
 	goal = getattr(multiworld.worlds[player].options, "goal")
 	exclude_lunatic = getattr(multiworld.worlds[player].options, "exclude_lunatic")
 	both_stage_4 = getattr(multiworld.worlds[player].options, "both_stage_4")
+	mode = getattr(multiworld.worlds[player].options, "mode")
+
+	# If we're in Normal mode, we force both_stage_4 to be False
+	if mode in NORMAL_MODE:
+		both_stage_4 = False
 
 	# Regions
 	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4)

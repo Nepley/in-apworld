@@ -4,10 +4,11 @@ from .gameHandler import gameHandler
 from .Tools import *
 
 class GuardRail:
-	def __init__(self, memory_controller: gameController, game_handler: gameHandler):
+	def __init__(self, memory_controller: gameController, game_handler: gameHandler, options: dict):
 		self.memory_controller = memory_controller
 		self.pm = memory_controller.pm
 		self.game_handler = game_handler
+		self.options = options
 
 	def check_memory_addresses(self):
 		result = {"error": False, "message": ""}
@@ -49,17 +50,18 @@ class GuardRail:
 				result["message"] = f"Starting power points not set correctly. Game: {starting_power_points}, Expected: {self.game_handler.getPower()}"
 
 		if not result["error"]:
-			# We check if stages are unlocked correctly
-			stages = self.game_handler.stages
-			for character in CHARACTERS:
-				handler_stage = getIntFromBinaryArray(stages[character])
-				for difficulty in range(4):
-					if self.game_handler.characters[character] and difficulty >= self.game_handler.getLowestDifficulty():
-						in_game_stage = self.memory_controller.getCharacterDifficulty(character, difficulty)
+			# We check if stages are unlocked correctly if we're in practice mode
+			if self.options["mode"] == PRACTICE_MODE:
+				stages = self.game_handler.stages
+				for character in CHARACTERS:
+					handler_stage = getIntFromBinaryArray(stages[character])
+					for difficulty in range(4):
+						if self.game_handler.characters[character] and difficulty >= self.game_handler.getLowestDifficulty():
+							in_game_stage = self.memory_controller.getCharacterDifficulty(character, difficulty)
 
-						if in_game_stage != handler_stage:
-							result["error"] = True
-							result["message"] = f"Character {character} has incorrect stages ({in_game_stage} != {handler_stage}) for difficulty {difficulty}."
+							if in_game_stage != handler_stage:
+								result["error"] = True
+								result["message"] = f"Character {character} has incorrect stages ({in_game_stage} != {handler_stage}) for difficulty {difficulty}."
 
 		return result
 
@@ -121,7 +123,7 @@ class GuardRail:
 							if menu == EXTRA_CHARACTER_MENU:
 								if characterUnlocked != characterHasExtra:
 									result["error"] = True
-									result["message"] = f"Character {character} Extra access is not locked or unlocked correctly. Extra Logical state: {characterLogicallyUnlocked}. Current state: {characterUnlocked}."
+									result["message"] = f"Character {character} Extra access is not locked or unlocked correctly. Extra Logical state: {characterLogicallyUnlocked}. Current state: {characterHasExtra}."
 							else:
 								if characterUnlocked != characterLogicallyUnlocked:
 									result["error"] = True
@@ -132,13 +134,12 @@ class GuardRail:
 
 				# If we're in the main menu, we check if the extra stage and normal mode are locked or unlocked correctly
 				elif menu == MAIN_MENU:
-					game_mode = self.game_handler.getGameMode()
 					can_extra = self.game_handler.canExtra()
 					lock_down = self.memory_controller.getMinimumCursorDown()
 					lock_up = self.memory_controller.getMinimumCursorUp()
-					minimum_cursor = 0 if game_mode == NORMAL_MODE else 1
+					minimum_cursor = 0 if self.options['mode'] in NORMAL_MODE else 1
 
-					if not can_extra and game_mode != NORMAL_MODE:
+					if not can_extra and self.options['mode'] not in NORMAL_MODE:
 						minimum_cursor += 2 # +1 When Spell Practice would be unlocked
 
 					if lock_down != minimum_cursor or lock_up != minimum_cursor:

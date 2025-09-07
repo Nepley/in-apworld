@@ -158,6 +158,11 @@ def create_regions(multiworld: MultiWorld, player: int, options):
 	extra = getattr(options, "extra_stage")
 	exclude_lunatic = getattr(options, "exclude_lunatic")
 	both_stage_4 = getattr(options, "both_stage_4")
+	mode = getattr(options, "mode")
+
+	# If we're in Normal mode, we force both_stage_4 to be False
+	if mode in NORMAL_MODE:
+		both_stage_4 = False
 
 	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4)
 

@@ -114,6 +114,9 @@ class gameHandler:
 					self.gameController.setCharacterDifficulty(characters, EXTRA, 0xFF)
 				else:
 					self.gameController.setCharacterDifficulty(characters, EXTRA, 0x00)
+		else:
+			for characters in CHARACTERS:
+				self.gameController.setCharacterDifficulty(characters, EXTRA, 0x00)
 
 	#
 	# Boss
@@ -443,6 +446,7 @@ class gameHandler:
 		self.gameController.disableDemo()
 		self.gameController.forceLockSoloCharacter()
 		self.gameController.initStageSelectHack()
+		self.gameController.setAllClearStats(0xFF)
 
 	def reset(self):
 		"""

@@ -50,6 +50,27 @@ class gameController:
 	addrNetherHard = None
 	addrNetherLunatic = None
 
+	# Character Clear Stats
+	addrIllusionEasyClear = None
+	addrIllusionNormalClear = None
+	addrIllusionHardClear = None
+	addrIllusionLunaticClear = None
+
+	addrMagicEasyClear = None
+	addrMagicNormalClear = None
+	addrMagicHardClear = None
+	addrMagicLunaticClear = None
+
+	addrDevilEasyClear = None
+	addrDevilNormalClear = None
+	addrDevilHardClear = None
+	addrDevilLunaticClear = None
+
+	addrNetherEasyClear = None
+	addrNetherNormalClear = None
+	addrNetherHardClear = None
+	addrNetherLunaticClear = None
+
 	# Extra stage access
 	addrIllusionExtra = None
 	addrMagicExtra = None
@@ -163,6 +184,26 @@ class gameController:
 		self.addrMagicExtra = [self.pm.base_address+ADDR_MAGIC_EXTRA[0], self.pm.base_address+ADDR_MAGIC_EXTRA[1], self.pm.base_address+ADDR_MAGIC_EXTRA[2], self.pm.base_address+ADDR_MAGIC_EXTRA[3]]
 		self.addrDevilExtra = [self.pm.base_address+ADDR_DEVIL_EXTRA[0], self.pm.base_address+ADDR_DEVIL_EXTRA[1], self.pm.base_address+ADDR_DEVIL_EXTRA[2], self.pm.base_address+ADDR_DEVIL_EXTRA[3]]
 		self.addrNetherExtra = [self.pm.base_address+ADDR_NETHER_EXTRA[0], self.pm.base_address+ADDR_NETHER_EXTRA[1], self.pm.base_address+ADDR_NETHER_EXTRA[2], self.pm.base_address+ADDR_NETHER_EXTRA[3]]
+
+		self.addrIllusionEasyClear = self.pm.base_address+ADDR_ILLUSION_EASY_CLEAR
+		self.addrIllusionNormalClear = self.pm.base_address+ADDR_ILLUSION_NORMAL_CLEAR
+		self.addrIllusionHardClear = self.pm.base_address+ADDR_ILLUSION_HARD_CLEAR
+		self.addrIllusionLunaticClear = self.pm.base_address+ADDR_ILLUSION_LUNATIC_CLEAR
+
+		self.addrMagicEasyClear = self.pm.base_address+ADDR_MAGIC_EASY_CLEAR
+		self.addrMagicNormalClear = self.pm.base_address+ADDR_MAGIC_NORMAL_CLEAR
+		self.addrMagicHardClear = self.pm.base_address+ADDR_MAGIC_HARD_CLEAR
+		self.addrMagicLunaticClear = self.pm.base_address+ADDR_MAGIC_LUNATIC_CLEAR
+
+		self.addrDevilEasyClear = self.pm.base_address+ADDR_DEVIL_EASY_CLEAR
+		self.addrDevilNormalClear = self.pm.base_address+ADDR_DEVIL_NORMAL_CLEAR
+		self.addrDevilHardClear = self.pm.base_address+ADDR_DEVIL_HARD_CLEAR
+		self.addrDevilLunaticClear = self.pm.base_address+ADDR_DEVIL_LUNATIC_CLEAR
+
+		self.addrNetherEasyClear = self.pm.base_address+ADDR_NETHER_EASY_CLEAR
+		self.addrNetherNormalClear = self.pm.base_address+ADDR_NETHER_NORMAL_CLEAR
+		self.addrNetherHardClear = self.pm.base_address+ADDR_NETHER_HARD_CLEAR
+		self.addrNetherLunaticClear = self.pm.base_address+ADDR_NETHER_LUNATIC_CLEAR
 
 		self.addrControllerHandle = self.pm.base_address+ADDR_CONTROLLER_HANDLER
 		self.addrInput = self.pm.base_address+ADDR_INPUT
@@ -834,6 +875,28 @@ class gameController:
 
 	def setPracticeStageScore(self, characterId, difficultyId, stageId, newScore):
 		return self.pm.write_int(self.addrPracticeScore[characterId][difficultyId][stageId], newScore)
+
+	# 0x01 = off, 0x77 = Final B opened, 0xFF = All Clear
+	def setAllClearStats(self, value):
+		self.pm.write_bytes(self.addrIllusionEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrIllusionNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrIllusionHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrIllusionLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrMagicEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrMagicNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrMagicHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrMagicLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrDevilEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrDevilNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrDevilHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrDevilLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrNetherEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrNetherNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrNetherHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrNetherLunaticClear, bytes([value]), 1)
 
 	def setKill(self, active):
 		if active:

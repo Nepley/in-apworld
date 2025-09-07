@@ -26,7 +26,7 @@ item_table: Dict[str, TItemData] = {
 	"+1 Life":				TItemData("Items", STARTING_ID + 0, ItemClassification.progression, 8),
 	"+1 Bomb":				TItemData("Items", STARTING_ID + 1, ItemClassification.progression, 8),
 	"Lower Difficulty":		TItemData("Items", STARTING_ID + 2, ItemClassification.progression, 3),
-	"+1 Continue":			TItemData("[Normal] Items", STARTING_ID + 3, ItemClassification.useful, 3),
+	# "+1 Continue":			TItemData("[Normal] Items", STARTING_ID + 3, ItemClassification.useful, 3),
 	"+25 Power Point":		TItemData("Power Point", STARTING_ID + 4, ItemClassification.useful, 5),
 
 	# Characters
