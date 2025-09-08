@@ -624,7 +624,7 @@ class TouhouContext(CommonContext):
 
 					if(not resourcesGiven):
 						await asyncio.sleep(0.5)
-						self.giveResources()
+						# self.giveResources()
 						resourcesGiven = True
 						currentLives = self.handler.getCurrentLives()
 
