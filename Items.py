@@ -26,8 +26,9 @@ item_table: Dict[str, TItemData] = {
 	"+1 Life":				TItemData("Items", STARTING_ID + 0, ItemClassification.progression, 8),
 	"+1 Bomb":				TItemData("Items", STARTING_ID + 1, ItemClassification.progression, 8),
 	"Lower Difficulty":		TItemData("Items", STARTING_ID + 2, ItemClassification.progression, 3),
-	# "+1 Continue":			TItemData("[Normal] Items", STARTING_ID + 3, ItemClassification.useful, 3),
+	"Time Gain":			TItemData("[Time] Items", STARTING_ID + 3, ItemClassification.progression),
 	"+25 Power Point":		TItemData("Power Point", STARTING_ID + 4, ItemClassification.useful, 5),
+	"+1000 Time Point":		TItemData("Time Point", STARTING_ID + 5, ItemClassification.useful, 10),
 
 	# Characters
 	"Illusionary Barrier Team":		TItemData("Characters", STARTING_ID + 100, ItemClassification.progression),
@@ -98,13 +99,17 @@ item_table: Dict[str, TItemData] = {
 
 	# Junk
 	"+1 Power Point":	TItemData("Filler", STARTING_ID + 400),
+	"+10 Time Point":	TItemData("Filler", STARTING_ID + 401),
+	"+50 Time Point":	TItemData("Filler", STARTING_ID + 402),
 
 	# Trap
-	"-50% Power Point":		TItemData("Traps", STARTING_ID + 500, ItemClassification.trap),
-	"-1 Bomb":				TItemData("Traps", STARTING_ID + 501, ItemClassification.trap),
-	"-1 Life":				TItemData("Traps", STARTING_ID + 502, ItemClassification.trap),
-	"Reverse Movement":		TItemData("Traps", STARTING_ID + 503, ItemClassification.trap),
-	"Aya Speed":			TItemData("Traps", STARTING_ID + 504, ItemClassification.trap),
-	"Freeze":				TItemData("Traps", STARTING_ID + 505, ItemClassification.trap),
-	"Power Point Drain":	TItemData("Traps", STARTING_ID + 506, ItemClassification.trap),
+	"-50% Power Point":				TItemData("Traps", STARTING_ID + 500, ItemClassification.trap),
+	"-1 Bomb":						TItemData("Traps", STARTING_ID + 501, ItemClassification.trap),
+	"-1 Life":						TItemData("Traps", STARTING_ID + 502, ItemClassification.trap),
+	"Reverse Movement":				TItemData("Traps", STARTING_ID + 503, ItemClassification.trap),
+	"Aya Speed":					TItemData("Traps", STARTING_ID + 504, ItemClassification.trap),
+	"Freeze":						TItemData("Traps", STARTING_ID + 505, ItemClassification.trap),
+	"Power Point Drain":			TItemData("Traps", STARTING_ID + 506, ItemClassification.trap),
+	"Reverse Human/Youkai Gauge":	TItemData("Traps", STARTING_ID + 507, ItemClassification.trap),
+	"Extend Time Goal":				TItemData("Traps", STARTING_ID + 508, ItemClassification.trap),
 }

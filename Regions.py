@@ -2,7 +2,7 @@ from BaseClasses import MultiWorld, Region
 from .Locations import TLocation, location_table
 from .Variables import *
 
-def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4):
+def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check):
 	regions = {}
 	characters = CHARACTERS_LIST
 	regions["Menu"] = {"locations": None, "exits": characters}
@@ -47,7 +47,8 @@ def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4):
 
 				regions[f"[{character}] Stage {level_name}"] = {"locations": [], "exits": None}
 				for check in stage:
-					regions[f"[{character}] Stage {level_name}"]["locations"].append(f"[{character}] {check}")
+					if time_check or "Last Word" not in check:
+						regions[f"[{character}] Stage {level_name}"]["locations"].append(f"[{character}] {check}")
 				regions[f"[{character}] Stage {level_name}"]["locations"].append(f"[{character}] Stage {level_name} Clear")
 
 			if extra:
@@ -149,7 +150,8 @@ def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4):
 
 					regions[f"[{difficulty}][{character}] Stage {level_name}"] = {"locations": [], "exits": None}
 					for check in stage:
-						regions[f"[{difficulty}][{character}] Stage {level_name}"]["locations"].append(f"[{difficulty}][{character}] {check}")
+						if time_check or "Last Word" not in check:
+							regions[f"[{difficulty}][{character}] Stage {level_name}"]["locations"].append(f"[{difficulty}][{character}] {check}")
 
 	return regions
 
@@ -159,12 +161,13 @@ def create_regions(multiworld: MultiWorld, player: int, options):
 	exclude_lunatic = getattr(options, "exclude_lunatic")
 	both_stage_4 = getattr(options, "both_stage_4")
 	mode = getattr(options, "mode")
+	time_check = getattr(options, "time_check")
 
 	# If we're in Normal mode, we force both_stage_4 to be False
 	if mode in NORMAL_MODE:
 		both_stage_4 = False
 
-	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4)
+	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check)
 
 	# Set up the regions correctly.
 	for name, data in regions.items():

@@ -46,6 +46,7 @@ class TWorld(World):
 		exclude_lunatic = getattr(self.options, "exclude_lunatic")
 		extra = getattr(self.options, "extra_stage")
 		both_stage_4 = getattr(self.options, "both_stage_4")
+		time = getattr(self.options, "time")
 		goal = getattr(self.options, "goal")
 		traps = getattr(self.options, "traps")
 		power_point_trap = getattr(self.options, "power_point_trap")
@@ -55,6 +56,8 @@ class TWorld(World):
 		aya_speed_trap = getattr(self.options, "aya_speed_trap")
 		freeze_trap = getattr(self.options, "freeze_trap")
 		power_point_drain_trap = getattr(self.options, "power_point_drain_trap")
+		reverse_human_youkai_gauge_trap = getattr(self.options, "reverse_human_youkai_gauge_trap")
+		extend_time_goal_trap = getattr(self.options, "extend_time_goal_trap")
 
 		# If we're in Normal mode, we force both_stage_4 to be False
 		if mode in NORMAL_MODE:
@@ -85,8 +88,8 @@ class TWorld(World):
 				stages.append({"name": name, "data": data})
 				continue
 
-			# Ignored if it's not normal mode
-			if data.category == "[Normal] Items" and mode == PRACTICE_MODE:
+			# Ignored if time is not randomized
+			if data.category == "[Time] Items" and not time:
 				continue
 
 			# Will be added later
@@ -203,7 +206,7 @@ class TWorld(World):
 			number_traps = int(remaining_locations * traps / 100)
 
 			if number_traps > 0:
-				trapList = self.random.choices(["-50% Power Point", "-1 Bomb", "-1 Life", "Reverse Movement", "Aya Speed", "Freeze", "Power Point Drain"], weights=[power_point_trap, bomb_trap, life_trap, reverse_movement_trap, aya_speed_trap, freeze_trap, power_point_drain_trap], k=number_traps)
+				trapList = self.random.choices(["-50% Power Point", "-1 Bomb", "-1 Life", "Reverse Movement", "Aya Speed", "Freeze", "Power Point Drain", "Reverse Human/Youkai Gauge", "Extend Time Goal"], weights=[power_point_trap, bomb_trap, life_trap, reverse_movement_trap, aya_speed_trap, freeze_trap, power_point_drain_trap, reverse_human_youkai_gauge_trap, extend_time_goal_trap], k=number_traps)
 				for trap in trapList:
 					item_pool.append(self.create_item(trap))
 

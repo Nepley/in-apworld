@@ -117,6 +117,19 @@ class DifficultyCheck(Choice):
 	option_true = 1
 	option_true_with_lower = 2
 
+class TimeCheck(Toggle):
+	"""
+	If having enough Time and finishing (By dying or clearing it) the Last Word at the end of a stage grant a check
+    Only stages where the Time Goal is above 0 are concerned (stage 1 to 5)
+	"""
+	display_name = "Time Check"
+
+class Time(Toggle):
+	"""
+	Determine if the abilty to gain Time is randomized.
+	"""
+	display_name = "Time Randomized"
+
 class BothStage4(Toggle):
 	"""
 	Determine if each team has access to the stage 4A and 4B or only the one they are assigned
@@ -225,6 +238,26 @@ class PowerPointDrainTrap(Range):
 	range_end = 100
 	default = 15
 
+class ReverseHumanYoukaiGaugeTrap(Range):
+	"""
+	Weight of the reverse human youkai trap.
+    This trap make the humain/Youkai gauge gain reversed but not the effect
+	"""
+	display_name = "Reverse Humain/Youkai gauge trap"
+	range_start = 0
+	range_end = 100
+	default = 15
+
+class ExtendTimeGoalTrap(Range):
+	"""
+	Weight of the extend time goal trap.
+    Add 25% to the time requirement of the current stage
+	"""
+	display_name = "Extend time goal trap"
+	range_start = 0
+	range_end = 100
+	default = 15
+
 @dataclass
 class Th08Options(PerGameCommonOptions):
 	mode: Mode
@@ -241,6 +274,8 @@ class Th08Options(PerGameCommonOptions):
 	number_life_extra: NumberLifeExtra
 	number_bomb_extra: NumberBombsExtra
 	difficulty_check: DifficultyCheck
+	time_check: TimeCheck
+	time: Time
 	both_stage_4: BothStage4
 	goal: Goal
 	ending_required: EndingRequired
@@ -254,3 +289,5 @@ class Th08Options(PerGameCommonOptions):
 	aya_speed_trap: AyaSpeedTrap
 	freeze_trap: FreezeTrap
 	power_point_drain_trap: PowerPointDrainTrap
+	reverse_human_youkai_gauge_trap: ReverseHumanYoukaiGaugeTrap
+	extend_time_goal_trap: ExtendTimeGoalTrap

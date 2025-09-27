@@ -49,7 +49,7 @@ class TouhouContext(CommonContext):
 
 		# Counter
 		self.difficulties = 3
-		self.traps = {"power_point_drain": 0, "reverse_control": 0, "aya_speed": 0, "freeze": 0, "bomb": 0, "life": 0, "power_point": 0}
+		self.traps = {"power_point_drain": 0, "reverse_control": 0, "aya_speed": 0, "freeze": 0, "bomb": 0, "life": 0, "power_point": 0, "reverse_human_youkai_gauge": 0, "extend_time_goal": 0}
 		self.can_trap = True
 
 		self.options = None
@@ -163,12 +163,16 @@ class TouhouContext(CommonContext):
 					self.handler.unlockDifficulty(self.difficulties)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 3: # 1 Continue
-					self.handler.addContinue()
+				case 3: # Time Gain
+					self.handler.unlockTimeGain()
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 4: # 25 Power Point
 					self.handler.add25Power()
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 5: # 1000 Time Point
+					self.handler.addTimePoint(1000)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 100: # Illusion Team
@@ -447,6 +451,14 @@ class TouhouContext(CommonContext):
 					self.handler.add1Power()
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 401: # 10 Time Point
+					self.handler.addTimePoint(10)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 402: # 50 Time Point
+					self.handler.addTimePoint(50)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 500: # -50% Power Point
 					self.traps["power_point"] += 1
 				case 501: # -1 Bomb
@@ -454,13 +466,17 @@ class TouhouContext(CommonContext):
 				case 502: # -1 Life
 					self.traps["life"] += 1
 				case 503: # Reverse Movement
-					self.traps["reverse_control"] += 1
+					self.traps["reverse_control"] = 1
 				case 504: # Aya Speed
-					self.traps["aya_speed"] += 1
+					self.traps["aya_speed"] = 1
 				case 505: # Freeze
 					self.traps["freeze"] += 1
 				case 506: # Power Point Drain
-					self.traps["power_point_drain"] += 1
+					self.traps["power_point_drain"] = 1
+				case 507: # Reverse Human Youkai Gauge
+					self.traps["reverse_human_youkai_gauge"] = 1
+				case 508: # Extend Time Goal
+					self.traps["extend_time_goal"] += 1
 				case _:
 					logger.error(f"Unknown Item: {item}")
 
@@ -639,9 +655,9 @@ class TouhouContext(CommonContext):
 						continue
 
 					# Boss Check
-					nbBoss = 2
+					nbBoss = 3 if self.options['time_check'] and self.handler.getCurrentStage() <= 6 else 2
 					if(not bossPresent):
-						if(self.handler.isBossPresent()):
+						if(self.handler.isBossPresent() and bossCounter < nbBoss-1):
 							bossPresent = True
 							bossCounter += 1
 					else:
@@ -696,10 +712,14 @@ class TouhouContext(CommonContext):
 		try:
 			mode = self.options['mode']
 			exclude_lunatic = self.options['exclude_lunatic']
+			time = self.options['time']
 
 			if exclude_lunatic:
 				self.difficulties -= 1
 				self.handler.unlockDifficulty(self.difficulties)
+
+			if not time:
+				self.handler.unlockTimeGain()
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.1)
@@ -751,6 +771,7 @@ class TouhouContext(CommonContext):
 			AyaSpeed = False
 			Freeze = False
 			InLevel = False
+			reversedHYGauge = False
 			TransitionTimer = 2
 			counterTransition = 0
 			freezeTimer = 2
@@ -823,6 +844,17 @@ class TouhouContext(CommonContext):
 							self.msgQueue.append({"msg": SHORT_TRAP_NAME['power_point'], "color": BLUE_TEXT})
 							self.handler.playSound(0x1F)
 							self.handler.halfPowerPoint()
+						elif not reversedHYGauge and self.traps['reverse_human_youkai_gauge'] > 0:
+							self.traps['reverse_human_youkai_gauge'] -= 1
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['reverse_human_youkai_gauge'], "color": BLUE_TEXT})
+							self.handler.playSound(0x0D)
+							self.handler.setHumanYoukaiGauge(False)
+							reversedHYGauge = True
+						elif self.traps['extend_time_goal'] > 0:
+							self.traps['extend_time_goal'] -= 1
+							self.msgQueue.append({"msg": SHORT_TRAP_NAME['extend_time_goal'], "color": BLUE_TEXT})
+							self.handler.playSound(0x0D)
+							self.handler.extendTimeGoal()
 
 						# Power Point Drain apply each loop until the player dies or the level is exited
 						if PowerPointDrain:
@@ -837,8 +869,11 @@ class TouhouContext(CommonContext):
 								counterFreeze = 0
 								self.handler.resetSpeed()
 				else:
-					if NoFocus:
-						self.handler.canFocus(True)
+					# if NoFocus:
+					# 	self.handler.canFocus(True)
+
+					if reversedHYGauge:
+						self.handler.setHumanYoukaiGauge(True)
 
 					InLevel = False
 					PowerPointDrain = False
@@ -846,6 +881,7 @@ class TouhouContext(CommonContext):
 					ReverseControls = False
 					AyaSpeed = False
 					Freeze = False
+					reversedHYGauge = False
 					counterTransition = 0
 					counterFreeze = 0
 					self.can_trap = True

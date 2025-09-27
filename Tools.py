@@ -73,7 +73,7 @@ def getLocationMapping(difficulty):
 			else:
 				level = int(level_id)-1
 
-			counter = len(STAGES_LIST[level])-1
+			counter = 1
 
 			# If it's the final stage clear or the extra stage, we add it to the list
 			if level == 7 or level == 6:

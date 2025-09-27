@@ -1,4 +1,5 @@
 from BaseClasses import MultiWorld
+from worlds.generic.Rules import add_rule
 from .Variables import *
 from .Regions import get_regions
 
@@ -218,17 +219,26 @@ def set_rules(multiworld: MultiWorld, player: int):
 	exclude_lunatic = getattr(multiworld.worlds[player].options, "exclude_lunatic")
 	both_stage_4 = getattr(multiworld.worlds[player].options, "both_stage_4")
 	mode = getattr(multiworld.worlds[player].options, "mode")
+	time_check = getattr(multiworld.worlds[player].options, "time_check")
+	time = getattr(multiworld.worlds[player].options, "time")
 
 	# If we're in Normal mode, we force both_stage_4 to be False
 	if mode in NORMAL_MODE:
 		both_stage_4 = False
 
 	# Regions
-	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4)
+	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check)
 
 	for name, data in regions.items():
 		if data["exits"]:
 			connect_regions(multiworld, player, name, data["exits"])
+
+		# Last Word locations
+		if time and data["locations"]:
+			for location_name in data["locations"]:
+				if "Last Word" in location_name:
+					location = multiworld.get_location(location_name, player)
+					add_rule(location, lambda state: state.has("Time Gain", player))
 
 	# Endings
 

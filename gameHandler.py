@@ -270,7 +270,7 @@ class gameHandler:
 
 	def getCursorPosition(self):
 		return self.gameController.getMenuCursor()
-	
+
 	def getCurrentCharacter(self):
 		return self.gameController.getCharacter()
 
@@ -347,6 +347,14 @@ class gameHandler:
 		if(self.continues < 3):
 			self.continues += 1
 
+	def addTimePoint(self, value, addInLevel = True):
+		self.time_point += value
+
+		self.gameController.setStartingTimePoint(self.time_point)
+
+		if addInLevel and self.gameController.getGameMode() == IN_GAME:
+			self.gameController.setTimePoint(self.gameController.getTimePoint() + value)
+
 	def addEnding(self, character, type):
 		self.endings[character][type] += 1
 
@@ -374,6 +382,9 @@ class gameHandler:
 
 			if self.gameController.getMenu() not in [9, 11, 13]:
 				self.gameController.setCharacter(character)
+
+	def unlockTimeGain(self):
+		self.gameController.setTimeGain(True)
 
 	#
 	# Traps
@@ -420,6 +431,12 @@ class gameHandler:
 		self.gameController.setNormalSpeedD(self.lastSpeeds[2])
 		self.gameController.setFocusSpeedD(self.lastSpeeds[3])
 
+	def setHumanYoukaiGauge(self, add):
+		self.gameController.setHYGaugeGauge(add)
+
+	def extendTimeGoal(self):
+		self.gameController.setTimeGoal(self.gameController.getTimeGoal() + ((self.gameController.getTimeGoal()*25)//100))
+
 	#
 	# Other
 	#
@@ -434,11 +451,13 @@ class gameHandler:
 		self.gameController.initStartingLives()
 		self.gameController.initStartingBombs()
 		self.gameController.initPowerHack()
+		self.gameController.initTimeHack()
 
 		self.gameController.setStartingLives(self.lives)
 		self.gameController.setNormalContinueLives(self.lives)
 		self.gameController.setStartingBombs(self.bombs)
 		self.gameController.setStartingPowerPoint(self.power)
+		self.gameController.setStartingTimePoint(self.time_point)
 
 		self.gameController.initSoundHack()
 		self.gameController.initDifficultyHack()
@@ -447,6 +466,7 @@ class gameHandler:
 		self.gameController.forceLockSoloCharacter()
 		self.gameController.initStageSelectHack()
 		self.gameController.setAllClearStats(0xFF)
+		self.gameController.setTimeGain(False)
 
 	def reset(self):
 		"""
@@ -457,6 +477,7 @@ class gameHandler:
 		self.bombs = 0
 		self.power = 0
 		self.continues = 0
+		self.time_point = 0
 
 		self.stages = {}
 		for character in CHARACTERS:
@@ -482,7 +503,7 @@ class gameHandler:
 		for character in CHARACTERS:
 			self.bossBeaten[character] = {}
 			for difficulty in range(4):
-				self.bossBeaten[character][difficulty] = [[False, False], [False, False], [False, False], [False, False], [False, False], [False, False], [False, False], [False, False]]
+				self.bossBeaten[character][difficulty] = [[False, False, False], [False, False, False], [False, False, False], [False, False, False], [False, False, False], [False, False, False], [False, False], [False, False]]
 
 		self.extraBeaten = {}
 		for character in CHARACTERS:

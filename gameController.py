@@ -106,6 +106,7 @@ class gameController:
 	addrAntiTemperHack = None
 	addrCharacterDefaultCursorCondition = None
 	addrForceLockSoloCharacter = None
+	addrHYGaugeHack = None
 
 	# Resources Hack
 	addrLifeHack1 = None
@@ -137,8 +138,10 @@ class gameController:
 	addrStageSelectStage4Hack2 = None
 
 	# Time
-	addrTime1 = None
-	addrTime2 = None
+	addrTimeGainHack = None
+	addrTimeHack = None
+	addrStartingTime = None
+	addrTimeGoal = None
 
 	def __init__(self):
 		self.pm = pymem.Pymem(GAME_NAME)
@@ -217,6 +220,7 @@ class gameController:
 		self.addrAntiTemperHack = self.pm.base_address+ADDR_ANTI_TEMPER_HACK
 		self.addrCharacterDefaultCursorCondition = self.pm.base_address+ADDR_CHARACTER_DEFAULT_CURSOR_CONDITION
 		self.addrForceLockSoloCharacter = self.pm.base_address+ADDR_FORCE_LOCK_SOLO_CHARACTER
+		self.addrHYGaugeHack = self.pm.base_address+ADDR_HY_GAUGE_HACK
 
 		self.addrKillCondition = self.pm.base_address+ADDR_KILL_CONDITION
 
@@ -250,6 +254,12 @@ class gameController:
 
 		self.addrStageSelectStage4Hack1 = self.pm.base_address+ADDR_STAGE_SELECT_STAGE_4_HACK_1
 		self.addrStageSelectStage4Hack2 = self.pm.base_address+ADDR_STAGE_SELECT_STAGE_4_HACK_2
+
+		self.addrTimeGainHack = self.pm.base_address+ADDR_TIME_GAIN_HACK
+		self.addrTimeHack = self.pm.base_address+ADDR_TIME_HACK
+		self.addrStartingTime = self.pm.base_address+ADDR_STARTING_TIME
+		self.addrCurrentTime = getPointerAddress(self.pm, self.pm.base_address+ADDR_CURRENT_TIME[0], ADDR_CURRENT_TIME[1:])
+		self.addrTimeGoal = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_GOAL[0], ADDR_TIME_GOAL[1:])
 
 		self.addrPracticeScore = {
 			ILLUSION_TEAM:
@@ -479,6 +489,10 @@ class gameController:
 		self.addrContinues = getPointerAddress(self.pm, self.pm.base_address+ADDR_CONTINUE[0], ADDR_CONTINUE[1:])
 		return int.from_bytes(self.pm.read_bytes(self.addrContinues, 1))
 
+	def getTimePoint(self):
+		self.addrCurrentTime = getPointerAddress(self.pm, self.pm.base_address+ADDR_CURRENT_TIME[0], ADDR_CURRENT_TIME[1:])
+		return self.pm.read_int(self.addrCurrentTime)
+
 	def getIllusionEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrIllusionEasy, 1))
 
@@ -669,6 +683,10 @@ class gameController:
 	def getFpsText(self):
 		return self.pm.read_bytes(self.addrFpsText, 8)
 
+	def getTimeGoal(self):
+		self.addrTimeGoal = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_GOAL[0], ADDR_TIME_GOAL[1:])
+		return self.pm.read_int(self.addrTimeGoal)
+
 	def setMenuCursor(self, newCursor):
 		self.addrMenuCursor = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
 		self.pm.write_bytes(self.addrMenuCursor, bytes([newCursor]), 1)
@@ -701,6 +719,14 @@ class gameController:
 		self.addrContinues = getPointerAddress(self.pm, self.pm.base_address+ADDR_CONTINUE[0], ADDR_CONTINUE[1:])
 		self.pm.write_bytes(self.addrContinues, bytes([newContinue]), 1)
 
+	def setTimePoint(self, newTimePoint):
+		self.addrCurrentTime = getPointerAddress(self.pm, self.pm.base_address+ADDR_CURRENT_TIME[0], ADDR_CURRENT_TIME[1:])
+		self.pm.write_int(self.addrCurrentTime, newTimePoint)
+
+	def setTimeGoal(self, newTimeGoal):
+		self.addrTimeGoal = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_GOAL[0], ADDR_TIME_GOAL[1:])
+		self.pm.write_int(self.addrTimeGoal, newTimeGoal)
+
 	def setStartingLives(self, newStartingLives):
 		self.pm.write_float(self.addrStartingLives, float(newStartingLives))
 
@@ -712,6 +738,9 @@ class gameController:
 
 	def setStartingPowerPoint(self, newStartingPowerPoint):
 		self.pm.write_float(self.addrStartingPowerPoint, float(newStartingPowerPoint))
+
+	def setStartingTimePoint(self, newStartingTime):
+		self.pm.write_int(self.addrStartingTime, newStartingTime)
 
 	def setMisses(self, newMisses):
 		self.pm.write_bytes(self.addrMisses, bytes([newMisses]), 1)
@@ -869,6 +898,12 @@ class gameController:
 		self.addrFocusSpeedD = getPointerAddress(self.pm, self.pm.base_address+ADDR_FOCUS_SPEED_D[0], ADDR_FOCUS_SPEED_D[1:])
 		self.pm.write_float(self.addrFocusSpeedD, newFocusSpeedD)
 
+	def setHYGaugeGauge(self, add):
+		if add:
+			self.pm.write_bytes(self.addrHYGaugeHack, bytes([0x03]), 1)
+		else:
+			self.pm.write_bytes(self.addrHYGaugeHack, bytes([0x2B]), 1)
+
 	def resetBossPresent(self):
 		self.pm.write_bytes(self.addrIsBossPresent1, bytes([0]), 1)
 		self.pm.write_bytes(self.addrIsBossPresent2, bytes([0]), 1)
@@ -960,6 +995,15 @@ class gameController:
 		# Hack for stopping the stage 6B unlock from also unlocking both stage 4
 		self.pm.write_bytes(self.addrStageSelectStage4Hack1, bytes([0xEB]), 1)
 		self.pm.write_bytes(self.addrStageSelectStage4Hack2, bytes([0xEB]), 1)
+
+	def initTimeHack(self):
+		self.pm.write_bytes(self.addrTimeHack, bytes([0xC7, 0x40, 0x3C, 0x00, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90]), 10)
+
+	def setTimeGain(self, active):
+		if active:
+			self.pm.write_bytes(self.addrTimeGainHack, bytes([0x89, 0x51, 0x3C]), 3)
+		else:
+			self.pm.write_bytes(self.addrTimeGainHack, bytes([0x90, 0x90, 0x90]), 3)
 
 	def forceLockSoloCharacter(self):
 		self.pm.write_bytes(self.addrForceLockSoloCharacter, bytes([0xEB]), 1)

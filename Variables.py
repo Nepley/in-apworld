@@ -87,12 +87,12 @@ ITEM_TO_CHARACTER = {
 DIFFICULTY_LIST = ["Easy", "Normal", "Hard", "Lunatic"]
 EXTRA_CHECKS = ["Keine - MidBoss 2", "Mokou Defeated"]
 STAGES_LIST = [
-	["Wriggle - MidBoss", "Wriggle Defeated"],
-	["Mystia - MidBoss", "Mystia Defeated"],
-	["Keine - Midboss 1", "Keine Defeated"],
-	["Reimu - Midboss", "Reimu Defeated"],
-	["Marisa - Midboss", "Marisa Defeated"],
-	["Tewi Defeated", "Reisen Defeated"],
+	["Wriggle - MidBoss", "Wriggle Defeated", "Wriggle - Last Word"],
+	["Mystia - MidBoss", "Mystia Defeated", "Mystia - Last Word"],
+	["Keine - Midboss 1", "Keine Defeated", "Keine - Last Word"],
+	["Reimu - Midboss", "Reimu Defeated", "Reimu - Last Word"],
+	["Marisa - Midboss", "Marisa Defeated", "Marisa - Last Word"],
+	["Tewi Defeated", "Reisen Defeated", "Reisen - Last Word"],
 	["Eirin - Midboss 1", "Eirin Defeated"],
 	["Eirin - Midboss 2", "Kaguya Defeated"],
 	EXTRA_CHECKS
@@ -369,6 +369,14 @@ ADDR_STAGE_SELECT_STAGE_4_HACK_2 = 0x0006F4C6
 # FPS
 ADDR_FPS_UPDATE = 0x00047212
 ADDR_FPS_TEXT = 0x013CE658
+
+# Time
+ADDR_TIME_GAIN_HACK = 0x00018253
+ADDR_TIME_HACK = 0x0003B23C
+ADDR_TIME_GOAL = [0x0120F510, 0x40]
+ADDR_CURRENT_TIME = [0x0120F510, 0x3C]
+ADDR_STARTING_TIME = 0x0003B23F
+ADDR_HY_GAUGE_HACK = 0x0003C0E0
 
 # Others
 ADDR_KILL_CONDITION = 0x0004A312

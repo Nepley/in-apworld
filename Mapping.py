@@ -197,8 +197,9 @@ SHORT_ITEM_NAME = {
 	0: "+1 Life",
 	1: "+1 Bomb",
 	2: "Low Diff",
-	3: "+1 Cont.",
+	3: "TimeGain",
 	4: "+25 PP",
+	5: "+1000 TP",
 	100: "Illusion",
 	101: "Magic",
 	102: "Devil",
@@ -261,6 +262,8 @@ SHORT_ITEM_NAME = {
 	310: "Ending M",
 	311: "Ending M",
 	400: "+1 PP",
+	401: "+10 TP",
+	402: "+50 TP",
 	500: "-50% PP",
 	501: "-1 Bomb",
 	502: "-1 Life",
@@ -278,5 +281,7 @@ SHORT_TRAP_NAME = {
 	"reverse_control": "Reverse",
 	"aya_speed": "Aya Sp.",
 	"freeze": "Freeze",
-	"power_point_drain": "PP Drain"
+	"power_point_drain": "PP Drain",
+	"reverse_human_youkai_gauge": "Rev H/Y",
+	"extend_time_goal": "Ext Time"
 }
