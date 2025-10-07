@@ -24,6 +24,9 @@ class gameHandler:
 
 	firstCharacterUnlocked = False
 
+	limitLives = 8
+	limitBombs = 8
+
 	def __init__(self):
 		self.gameController = gameController()
 		self.reset()
@@ -183,10 +186,10 @@ class gameHandler:
 	#
 
 	def getLives(self):
-		return self.lives
+		return min(self.lives, self.limitLives)
 
 	def getBombs(self):
-		return self.bombs
+		return min(self.bombs, self.limitBombs)
 
 	def getPower(self):
 		return self.power
@@ -282,8 +285,8 @@ class gameHandler:
 		if(self.lives < 8):
 			self.lives += 1
 
-		self.gameController.setStartingLives(self.lives)
-		self.gameController.setNormalContinueLives(self.lives)
+		self.gameController.setStartingLives(self.getLives())
+		self.gameController.setNormalContinueLives(self.getLives())
 
 		if addInLevel and self.gameController.getGameMode() == IN_GAME:
 			self.gameController.setLives(self.gameController.getLives() + 1)
@@ -292,7 +295,7 @@ class gameHandler:
 		if(self.bombs < 8):
 			self.bombs += 1
 
-		self.gameController.setStartingBombs(self.bombs)
+		self.gameController.setStartingBombs(self.getBombs())
 
 		if addInLevel and self.gameController.getGameMode() == IN_GAME:
 			self.gameController.setBombs(self.gameController.getBombs() + 1)
@@ -385,6 +388,17 @@ class gameHandler:
 
 	def unlockTimeGain(self):
 		self.gameController.setTimeGain(True)
+
+	def setLivesLimit(self, limit):
+		if limit >= 0 and limit <= 8:
+			self.limitLives = limit
+			self.gameController.setStartingLives(self.getLives())
+			self.gameController.setNormalContinueLives(self.getLives())
+
+	def setBombsLimit(self, limit):
+		if limit >= 0 and limit <= 8:
+			self.limitBombs = limit
+			self.gameController.setStartingBombs(self.getBombs())
 
 	#
 	# Traps

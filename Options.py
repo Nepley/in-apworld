@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, Range, Toggle, DeathLink, PerGameCommonOptions
+from Options import Choice, Range, Toggle, PerGameCommonOptions
 
 class Mode(Choice):
 	"""
@@ -155,11 +155,40 @@ class EndingRequired(Choice):
 	option_all_characters = 1
 	default = 0
 
+class DeathLink(Toggle):
+	"""
+	When you die, everyone who enabled death link dies. Of course, the reverse is true too. Can be changed later.
+	"""
+	display_name = "Death Link"
+
+class DeathLinkAmnesty(Range):
+	"""
+	Number of death before sending a DeathLink. Can be changed later.
+	"""
+	display_name = "DeathLink Amnesty"
+	range_start = 0
+	range_end = 10
+	default = 0
+
 class RingLink(Toggle):
     """
-    Whether your in-level Power Point gain/loss is linked to other players
+    Whether your in-level Power Point gain/loss is linked to other players. Can be changed later.
     """
     display_name = "Ring Link"
+
+class LimitLives(Range):
+	"""Limit on the maximum number of lives you can have. It only apply on the client, not on the item pool or logic. Can be changed later."""
+	display_name = "Lives limit"
+	range_start = 0
+	range_end = 8
+	default = 8
+
+class LimitBombs(Range):
+	"""Limit on the maximum number of bombs you can have. It only apply on the client, not on the item pool generation or logic. Can be changed later"""
+	display_name = "Bombs limit"
+	range_start = 0
+	range_end = 8
+	default = 8
 
 class Traps(Range):
 	"""Percentage of fillers that are traps"""
@@ -280,7 +309,10 @@ class Th08Options(PerGameCommonOptions):
 	goal: Goal
 	ending_required: EndingRequired
 	death_link: DeathLink
+	death_link_amnesty: DeathLinkAmnesty
 	ring_link: RingLink
+	limit_lives: LimitLives
+	limit_bombs: LimitBombs
 	traps: Traps
 	power_point_trap: PowerPointTrap
 	bomb_trap: BombTrap

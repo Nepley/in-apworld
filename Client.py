@@ -11,11 +11,120 @@ import traceback
 
 from CommonClient import (
 	CommonContext,
+	ClientCommandProcessor,
 	get_base_parser,
 	logger,
 	server_loop,
 	gui_enabled,
 )
+
+class TouhouClientProcessor(ClientCommandProcessor):
+	def _cmd_deathlink(self, active = None):
+		"""Toggle DeathLink on or off
+        :param active: If "on" or "true", enable DeathLink. If "off" or "false", disable DeathLink."""
+		changed = False
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if active is not None:
+				if active.lower() in ("on", "true"):
+					if "DeathLink" not in self.ctx.tags:
+						self.ctx.tags.add("DeathLink")
+						self.ctx.death_link_is_active = True
+						changed = True
+					logger.info("DeathLink enabled")
+				elif active.lower() in ("off", "false"):
+					if "DeathLink" in self.ctx.tags:
+						self.ctx.tags.remove("DeathLink")
+						self.ctx.death_link_is_active = False
+						changed = True
+					logger.info("DeathLink disabled")
+				else:
+					logger.error("Invalid argument, use 'on' or 'off'")
+
+				if changed:
+					asyncio.create_task(self.ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": self.ctx.tags}]))
+			else:
+				logger.info(f"DeathLink is {'enabled' if self.ctx.death_link_is_active else 'disabled'}")
+		else:
+			logger.error("DeathLink cannot be changed before connecting to the game and server")
+
+		return changed
+
+	def _cmd_deathlink_amnesty(self, value = -1):
+		"""Get or Set the number of death before sending a DeathLink
+        :param value: Set the amnesty to this value, must be between 0 and 10."""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if value == -1:
+				logger.info(f"Current DeathLink amnesty: {self.ctx.death_link_amnesty}")
+				return True
+			else:
+				try:
+					value = int(value)
+					if value < 0 or value > 10:
+						raise ValueError
+					self.ctx.death_link_amnesty = value
+					logger.info(f"New DeathLink amnesty: {value}")
+					return True
+				except ValueError:
+					logger.error("Invalid argument, amnesty must be between 0 and 10")
+					return False
+		else:
+			logger.error("DeathLink amnesty cannot be accessed before connecting to the game and server")
+			return False
+
+	def _cmd_ringlink(self, active = None):
+		"""Toggle RingLink on or off
+        :param active: If "on" or "true", enable RingLink. If "off" or "false", disable RingLink."""
+		changed = False
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if active is not None:
+				if active.lower() in ("on", "true"):
+					if "RingLink" not in self.ctx.tags:
+						self.ctx.tags.add("RingLink")
+						self.ctx.ring_link_is_active = True
+						changed = True
+					logger.info("RingLink enabled")
+				elif active.lower() in ("off", "false"):
+					if "RingLink" in self.ctx.tags:
+						self.ctx.tags.remove("RingLink")
+						changed = True
+						self.ctx.ring_link_is_active = False
+					logger.info("RingLink disabled")
+				else:
+					logger.error("Invalid argument, use 'on' or 'off'")
+
+				if changed:
+					asyncio.create_task(self.ctx.send_msgs([{"cmd": "ConnectUpdate", "tags": self.ctx.tags}]))
+			else:
+				logger.info(f"RingLink is {'enabled' if self.ctx.ring_link_is_active else 'disabled'}")
+		else:
+			logger.error("RingLink cannot be changed before connecting to the game and server")
+
+		return changed
+
+	def _cmd_limits(self, lives = -1, bombs = -1):
+		"""Get or Set the max limits for lives and bombs
+        :param lives: New max lives value, must be between 0 and 8.
+        :param bombs: New max bombs value, must be between 0 and 8."""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if lives == -1 and bombs == -1:
+				logger.info(f"Current max lives: {self.ctx.handler.limitLives} / Current max bombs: {self.ctx.handler.limitBombs}")
+				return True
+			else:
+				try:
+					lives = int(lives)
+					bombs = int(bombs)
+					if lives < 0 or lives > 8 or bombs < 0 or bombs > 8:
+						raise ValueError
+					self.ctx.handler.setLivesLimit(lives)
+					self.ctx.handler.setBombsLimit(bombs)
+					logger.info(f"New max lives: {lives} / New max bombs: {bombs}")
+					return True
+				except ValueError:
+					logger.error("Invalid argument, limits must be between 0 and 8")
+					return False
+		else:
+			logger.error("Limits cannot be accessed before connecting to the game and server")
+			return False
 
 class TouhouContext(CommonContext):
 	"""Touhou Game Context"""
@@ -24,6 +133,7 @@ class TouhouContext(CommonContext):
 		self.game = DISPLAY_NAME
 		self.items_handling = 0b111  # Item from starting inventory, own world and other world
 		self.pending_death_link = False
+		self.command_processor = TouhouClientProcessor
 
 		self.current_power_point = -1
 		self.ring_link_id = None
@@ -46,6 +156,9 @@ class TouhouContext(CommonContext):
 		self.is_connected = False
 		self.last_death_link = 0
 		self.last_ring_link = 0
+		self.death_link_is_active = False
+		self.ring_link_is_active = False
+		self.death_link_amnesty = 0
 
 		# Counter
 		self.difficulties = 3
@@ -537,7 +650,7 @@ class TouhouContext(CommonContext):
 		"""
 		Send a death link to the server if it's active.
 		"""
-		if self.options['death_link']:
+		if self.death_link_is_active:
 			await self.send_death()
 
 	def giveResources(self):
@@ -556,8 +669,13 @@ class TouhouContext(CommonContext):
 		self.handler.updateStageList(mode == PRACTICE_MODE)
 		self.handler.updatePracticeScore(self.location_mapping, self.previous_location_checked)
 
-	def addRingLinkTag(self):
-		self.tags.add("RingLink")
+	def setRingLinkTag(self, active):
+		if active:
+			self.tags.add("RingLink")
+			self.ring_link_is_active = True
+		else:
+			self.tags.remove("RingLink")
+			self.ring_link_is_active = False
 		asyncio.create_task(self.send_msgs([{"cmd": "ConnectUpdate", "tags": self.tags}]))
 
 	def checkVictory(self):
@@ -901,9 +1019,15 @@ class TouhouContext(CommonContext):
 			onGoingDeathLink = False
 			inLevel = False
 			currentMisses = 0
+			nb_death = 0
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
-				await asyncio.sleep(0.5)
+				if(self.death_link_is_active):
+					await asyncio.sleep(0.5)
+				else:
+					await asyncio.sleep(2)
+					inLevel = False
+					continue
 				game_mode = self.handler.getGameMode()
 				# If we failed to retrieve the game mode, we skip the loop
 				if game_mode == -2:
@@ -929,7 +1053,12 @@ class TouhouContext(CommonContext):
 							onGoingDeathLink = False
 							self.pending_death_link = False
 						else:
-							await self.send_death_link()
+							nb_death += 1
+							if nb_death >= self.death_link_amnesty:
+								await self.send_death_link()
+								nb_death = 0
+							else:
+								logger.info(f"DeathLink: {nb_death}/{self.death_link_amnesty}")
 
 						currentMisses += 1
 					# If no death has occured but a death link is pending, we try to kill the player
@@ -970,7 +1099,12 @@ class TouhouContext(CommonContext):
 			self.timer = 0.5
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
-				await asyncio.sleep(self.timer)
+				if(self.ring_link_is_active):
+					await asyncio.sleep(self.timer)
+				else:
+					await asyncio.sleep(2)
+					self.last_power_point = -1
+					continue
 				game_mode = self.handler.getGameMode()
 				# If we failed to retrieve the game mode, we skip the loop
 				if game_mode == -2:
@@ -1088,19 +1222,27 @@ async def game_watcher(ctx: TouhouContext):
 			asyncio.create_task(ctx.trap_loop())
 			asyncio.create_task(ctx.message_loop())
 			asyncio.create_task(ctx.guard_rail_loop())
+			asyncio.create_task(ctx.death_link_loop())
+			asyncio.create_task(ctx.ring_link_loop())
 
 			# We update the locations checked if there was any location that was already checked before the connection
 			await ctx.update_locations_checked()
 			ctx.updateStageList()
 
-			# Activating Death Link and its loop
+			# Activating Death Link / Ring Link if needed
 			if ctx.options['death_link']:
 				await ctx.update_death_link(True)
-				asyncio.create_task(ctx.death_link_loop())
+				ctx.death_link_is_active = True
+
+			if ctx.options['death_link_amnesty']:
+				ctx.death_link_amnesty = ctx.options['death_link_amnesty']
 
 			if ctx.options['ring_link']:
-				ctx.addRingLinkTag()
-				asyncio.create_task(ctx.ring_link_loop())
+				ctx.setRingLinkTag(True)
+
+			# We set the limits for lives and bombs
+			ctx.handler.setLivesLimit(ctx.options['limit_lives'])
+			ctx.handler.setBombsLimit(ctx.options['limit_bombs'])
 
 			# Infinite loop while there is no error. If there is an error, we exit this loop in order to restart the connection
 			while not ctx.exit_event.is_set() and not ctx.inError:
