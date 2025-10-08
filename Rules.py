@@ -233,10 +233,10 @@ def set_rules(multiworld: MultiWorld, player: int):
 		if data["exits"]:
 			connect_regions(multiworld, player, name, data["exits"])
 
-		# Last Word locations
+		# Last Spell locations
 		if time and data["locations"]:
 			for location_name in data["locations"]:
-				if "Last Word" in location_name:
+				if "Last Spell" in location_name:
 					location = multiworld.get_location(location_name, player)
 					add_rule(location, lambda state: state.has("Time Gain", player))
 

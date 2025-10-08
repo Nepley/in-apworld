@@ -42,5 +42,9 @@ for difficulty in DIFFICULTY_LIST:
 				continue
 
 			for check in stage:
+				# We remove the Last Spell location on Easy difficulty
+				if "Last Spell" in check and difficulty == "Easy":
+					continue
+
 				location_table[f"[{difficulty}][{character}] {check}"] = STARTING_ID + location_id_offset
 				location_id_offset += 1

@@ -47,7 +47,7 @@ def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_che
 
 				regions[f"[{character}] Stage {level_name}"] = {"locations": [], "exits": None}
 				for check in stage:
-					if time_check or "Last Word" not in check:
+					if time_check or "Last Spell" not in check:
 						regions[f"[{character}] Stage {level_name}"]["locations"].append(f"[{character}] {check}")
 				regions[f"[{character}] Stage {level_name}"]["locations"].append(f"[{character}] Stage {level_name} Clear")
 
@@ -150,7 +150,10 @@ def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_che
 
 					regions[f"[{difficulty}][{character}] Stage {level_name}"] = {"locations": [], "exits": None}
 					for check in stage:
-						if time_check or "Last Word" not in check:
+						if "Last Spell" in check and difficulty == "Easy":
+							continue
+
+						if time_check or "Last Spell" not in check:
 							regions[f"[{difficulty}][{character}] Stage {level_name}"]["locations"].append(f"[{difficulty}][{character}] {check}")
 
 	return regions

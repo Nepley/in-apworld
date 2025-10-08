@@ -87,12 +87,12 @@ ITEM_TO_CHARACTER = {
 DIFFICULTY_LIST = ["Easy", "Normal", "Hard", "Lunatic"]
 EXTRA_CHECKS = ["Keine - MidBoss 2", "Mokou Defeated"]
 STAGES_LIST = [
-	["Wriggle - MidBoss", "Wriggle Defeated", "Wriggle - Last Word"],
-	["Mystia - MidBoss", "Mystia Defeated", "Mystia - Last Word"],
-	["Keine - Midboss 1", "Keine Defeated", "Keine - Last Word"],
-	["Reimu - Midboss", "Reimu Defeated", "Reimu - Last Word"],
-	["Marisa - Midboss", "Marisa Defeated", "Marisa - Last Word"],
-	["Tewi Defeated", "Reisen Defeated", "Reisen - Last Word"],
+	["Wriggle - MidBoss", "Wriggle Defeated", "Wriggle - Last Spell"],
+	["Mystia - MidBoss", "Mystia Defeated", "Mystia - Last Spell"],
+	["Keine - Midboss 1", "Keine Defeated", "Keine - Last Spell"],
+	["Reimu - Midboss", "Reimu Defeated", "Reimu - Last Spell"],
+	["Marisa - Midboss", "Marisa Defeated", "Marisa - Last Spell"],
+	["Tewi Defeated", "Reisen Defeated", "Reisen - Last Spell"],
 	["Eirin - Midboss 1", "Eirin Defeated"],
 	["Eirin - Midboss 2", "Kaguya Defeated"],
 	EXTRA_CHECKS

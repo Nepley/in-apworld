@@ -119,7 +119,7 @@ class DifficultyCheck(Choice):
 
 class TimeCheck(Toggle):
 	"""
-	If having enough Time and finishing (By dying or clearing it) the Last Word at the end of a stage grant a check
+	If having enough Time and finishing (By dying or clearing it) the Last Spell at the end of a stage grant a check
     Only stages where the Time Goal is above 0 are concerned (stage 1 to 5)
 	"""
 	display_name = "Time Check"
