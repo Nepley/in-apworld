@@ -3,145 +3,10 @@ import pymem.exception
 from .Tools import getPointerAddress
 from .Variables import *
 from math import log
+from .SpellCards import SPELL_CARDS_LIST
 
 class gameController:
 	"""Class accessing the game memory"""
-	pm = None
-
-	# Player
-	addrStage = None
-	addrDifficulty = None
-	addrCharacter = None
-
-	# Resources
-	addrLives = None
-	addrBombs = None
-	addrPower = None
-	addrContinues = None
-
-	# Starting Resources
-	addrStartingLives = None
-	addrNormalContinueLives = None
-	addrStartingBombs = None
-	addrStartingPowerPoint = None
-
-	# Stats
-	addrMisses = None
-	addrScore = None
-
-	# Practice stage access
-	addrIllusionEasy = None
-	addrIllusionNormal = None
-	addrIllusionHard = None
-	addrIllusionLunatic = None
-
-	addrMagicEasy = None
-	addrMagicNormal = None
-	addrMagicHard = None
-	addrMagicLunatic = None
-
-	addrDevilEasy = None
-	addrDevilNormal = None
-	addrDevilHard = None
-	addrDevilLunatic = None
-
-	addrNetherEasy = None
-	addrNetherNormal = None
-	addrNetherHard = None
-	addrNetherLunatic = None
-
-	# Character Clear Stats
-	addrIllusionEasyClear = None
-	addrIllusionNormalClear = None
-	addrIllusionHardClear = None
-	addrIllusionLunaticClear = None
-
-	addrMagicEasyClear = None
-	addrMagicNormalClear = None
-	addrMagicHardClear = None
-	addrMagicLunaticClear = None
-
-	addrDevilEasyClear = None
-	addrDevilNormalClear = None
-	addrDevilHardClear = None
-	addrDevilLunaticClear = None
-
-	addrNetherEasyClear = None
-	addrNetherNormalClear = None
-	addrNetherHardClear = None
-	addrNetherLunaticClear = None
-
-	# Extra stage access
-	addrIllusionExtra = None
-	addrMagicExtra = None
-	addrDevilExtra = None
-	addrNetherExtra = None
-
-	# Practice stage score
-	addrPracticeScore = None
-
-	# Character speed
-	addrNormalSpeed = None
-	addrFocusSpeed = None
-	addrNormalSpeedD = None
-	addrFocusSpeedD = None
-
-	# FPS
-	addrFpsText = None
-	addrFpsUpdate = None
-
-	# Other
-	addrControllerHandle = None
-	addrInput = None
-	addrGameMode = None
-	addrMenu = None
-	addrMenuCursor = None
-	addrIsBossPresent1 = None
-	addrIsBossPresent2 = None
-	addrKillCondition = None
-	addrCharacterLock = None
-	addrForceExtra = None
-	addrDemoCondition = None
-	addrFocusCondition = None
-	addrAntiTemperHack = None
-	addrCharacterDefaultCursorCondition = None
-	addrForceLockSoloCharacter = None
-	addrHYGaugeHack = None
-
-	# Resources Hack
-	addrLifeHack1 = None
-	addrLifeHack2 = None
-	addrBombHack1 = None
-	addrBombHack2 = None
-	addrPowerHack1 = None
-	addrPowerHack2 = None
-	addrPowerHack3 = None
-	addrPowerHack4 = None
-
-	# Sound
-	addrCustomSoundId = None
-	addrSoundHack1 = None
-	addrSoundHack2 = None
-
-	# Difficulty
-	addrMinimumCursorDown = None
-	addrMinimumCursorUp = None
-	addrDifficultyCondition = None
-	addrLastDifficulty = None
-	addrDefaultDifficulty1 = None
-	addrDefaultDifficulty2 = None
-	addrDefaultExtraDifficulty = None
-	addrDifficultyCursorDefault = None
-
-	# Stage Select
-	addrStageSelectStage4Hack1 = None
-	addrStageSelectStage4Hack2 = None
-
-	# Time
-	addrTimeGainHack = None
-	addrTimeHack = None
-	addrStartingTime = None
-	addrTimeGoal = None
 
 	def __init__(self):
 		self.pm = pymem.Pymem(GAME_NAME)
@@ -187,6 +52,11 @@ class gameController:
 		self.addrMagicExtra = [self.pm.base_address+ADDR_MAGIC_EXTRA[0], self.pm.base_address+ADDR_MAGIC_EXTRA[1], self.pm.base_address+ADDR_MAGIC_EXTRA[2], self.pm.base_address+ADDR_MAGIC_EXTRA[3]]
 		self.addrDevilExtra = [self.pm.base_address+ADDR_DEVIL_EXTRA[0], self.pm.base_address+ADDR_DEVIL_EXTRA[1], self.pm.base_address+ADDR_DEVIL_EXTRA[2], self.pm.base_address+ADDR_DEVIL_EXTRA[3]]
 		self.addrNetherExtra = [self.pm.base_address+ADDR_NETHER_EXTRA[0], self.pm.base_address+ADDR_NETHER_EXTRA[1], self.pm.base_address+ADDR_NETHER_EXTRA[2], self.pm.base_address+ADDR_NETHER_EXTRA[3]]
+
+		self.addrIllusionSpellPractice = [self.pm.base_address+ADDR_ILLUSION_SPELL_PRACTICE[0], self.pm.base_address+ADDR_ILLUSION_SPELL_PRACTICE[1], self.pm.base_address+ADDR_ILLUSION_SPELL_PRACTICE[2], self.pm.base_address+ADDR_ILLUSION_SPELL_PRACTICE[3]]
+		self.addrMagicSpellPractice = [self.pm.base_address+ADDR_MAGIC_SPELL_PRACTICE[0], self.pm.base_address+ADDR_MAGIC_SPELL_PRACTICE[1], self.pm.base_address+ADDR_MAGIC_SPELL_PRACTICE[2], self.pm.base_address+ADDR_MAGIC_SPELL_PRACTICE[3]]
+		self.addrDevilSpellPractice = [self.pm.base_address+ADDR_DEVIL_SPELL_PRACTICE[0], self.pm.base_address+ADDR_DEVIL_SPELL_PRACTICE[1], self.pm.base_address+ADDR_DEVIL_SPELL_PRACTICE[2], self.pm.base_address+ADDR_DEVIL_SPELL_PRACTICE[3]]
+		self.addrNetherSpellPractice = [self.pm.base_address+ADDR_NETHER_SPELL_PRACTICE[0], self.pm.base_address+ADDR_NETHER_SPELL_PRACTICE[1], self.pm.base_address+ADDR_NETHER_SPELL_PRACTICE[2], self.pm.base_address+ADDR_NETHER_SPELL_PRACTICE[3]]
 
 		self.addrIllusionEasyClear = self.pm.base_address+ADDR_ILLUSION_EASY_CLEAR
 		self.addrIllusionNormalClear = self.pm.base_address+ADDR_ILLUSION_NORMAL_CLEAR
@@ -260,6 +130,9 @@ class gameController:
 		self.addrStartingTime = self.pm.base_address+ADDR_STARTING_TIME
 		self.addrCurrentTime = getPointerAddress(self.pm, self.pm.base_address+ADDR_CURRENT_TIME[0], ADDR_CURRENT_TIME[1:])
 		self.addrTimeGoal = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_GOAL[0], ADDR_TIME_GOAL[1:])
+
+		self.addrPlayerState = self.pm.base_address+ADDR_PLAYER_STATE
+		self.addrStruct = self.pm.base_address+ADDR_STRUCT
 
 		self.addrPracticeScore = {
 			ILLUSION_TEAM:
@@ -452,6 +325,17 @@ class gameController:
 			}
 		}
 
+		self.addrAllCharacterSpellCard = {}
+		self.addrSpellCards = {}
+		for id, spell in SPELL_CARDS_LIST.items():
+			self.addrAllCharacterSpellCard[id] = {"acquired": self.pm.base_address+spell["all_character_addresses"]["acquired"], "challenged": self.pm.base_address+spell["all_character_addresses"]["challenged"]}
+			self.addrSpellCards[id] = {}
+			for character in CHARACTERS:
+				self.addrSpellCards[id][character] = {"acquired": self.pm.base_address+spell["addresses"][character]["acquired"], "challenged": self.pm.base_address+spell["addresses"][character]["challenged"], "unlocked": self.pm.base_address+spell["addresses"][character]["unlocked"]}
+
+		self.addrLastWordConditions = [self.pm.base_address+addr for addr in ADDR_LAST_WORD_CONDITIONS]
+		self.addrLastWordUnlock = [self.pm.base_address+addr for addr in ADDR_LAST_WORD_UNLOCK]
+
 	def getStage(self):
 		stage = int.from_bytes(self.pm.read_bytes(self.addrStage, 1))
 		# If it's 0, then it's the extra stage
@@ -513,6 +397,14 @@ class gameController:
 				int.from_bytes(self.pm.read_bytes(self.addrIllusionExtra[3], 1))
 			]
 
+	def getIllusionSpellPractice(self):
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionSpellPractice[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionSpellPractice[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionSpellPractice[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrIllusionSpellPractice[3], 1))
+			]
+
 	def getMagicEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrMagicEasy, 1))
 
@@ -531,6 +423,14 @@ class gameController:
 				int.from_bytes(self.pm.read_bytes(self.addrMagicExtra[1], 1)),
 				int.from_bytes(self.pm.read_bytes(self.addrMagicExtra[2], 1)),
 				int.from_bytes(self.pm.read_bytes(self.addrMagicExtra[3], 1))
+			]
+
+	def getMagicSpellPractice(self):
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrMagicSpellPractice[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrMagicSpellPractice[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrMagicSpellPractice[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrMagicSpellPractice[3], 1))
 			]
 
 	def getDevilEasy(self):
@@ -553,6 +453,14 @@ class gameController:
 				int.from_bytes(self.pm.read_bytes(self.addrDevilExtra[3], 1))
 			]
 
+	def getDevilSpellPractice(self):
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrDevilSpellPractice[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrDevilSpellPractice[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrDevilSpellPractice[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrDevilSpellPractice[3], 1))
+			]
+
 	def getNetherEasy(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrNetherEasy, 1))
 
@@ -571,6 +479,14 @@ class gameController:
 				int.from_bytes(self.pm.read_bytes(self.addrNetherExtra[1], 1)),
 				int.from_bytes(self.pm.read_bytes(self.addrNetherExtra[2], 1)),
 				int.from_bytes(self.pm.read_bytes(self.addrNetherExtra[3], 1))
+			]
+
+	def getNetherSpellPractice(self):
+		return [
+				int.from_bytes(self.pm.read_bytes(self.addrNetherSpellPractice[0], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrNetherSpellPractice[1], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrNetherSpellPractice[2], 1)),
+				int.from_bytes(self.pm.read_bytes(self.addrNetherSpellPractice[3], 1))
 			]
 
 	def getInput(self):
@@ -687,6 +603,24 @@ class gameController:
 		self.addrTimeGoal = getPointerAddress(self.pm, self.pm.base_address+ADDR_TIME_GOAL[0], ADDR_TIME_GOAL[1:])
 		return self.pm.read_int(self.addrTimeGoal)
 
+	def getAllCharacterSpellCardAcquired(self, spell_id):
+		return int.from_bytes(self.pm.read_bytes(self.addrAllCharacterSpellCard[spell_id]["acquired"], 1))
+
+	def getAllCharacterSpellCardChallenged(self, spell_id):
+		return int.from_bytes(self.pm.read_bytes(self.addrAllCharacterSpellCard[spell_id]["challenged"], 1))
+
+	def getSpellCardAcquired(self, spell_id, character):
+		return int.from_bytes(self.pm.read_bytes(self.addrSpellCards[spell_id][character]["acquired"], 1))
+
+	def getSpellCardChallenged(self, spell_id, character):
+		return int.from_bytes(self.pm.read_bytes(self.addrSpellCards[spell_id][character]["challenged"], 1))
+
+	def getSpellCardUnlocked(self, spell_id, character):
+		return int.from_bytes(self.pm.read_bytes(self.addrSpellCards[spell_id][character]["unlocked"], 1))
+
+	def getPlayerState(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrPlayerState, 1))
+
 	def setMenuCursor(self, newCursor):
 		self.addrMenuCursor = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
 		self.pm.write_bytes(self.addrMenuCursor, bytes([newCursor]), 1)
@@ -763,6 +697,12 @@ class gameController:
 		self.pm.write_bytes(self.addrIllusionExtra[2], bytes([newIllusionExtra]), 1)
 		self.pm.write_bytes(self.addrIllusionExtra[3], bytes([newIllusionExtra]), 1)
 
+	def setIllusionSpellPractice(self, newIllusionSpellPractice):
+		self.pm.write_bytes(self.addrIllusionSpellPractice[0], bytes([newIllusionSpellPractice]), 1)
+		self.pm.write_bytes(self.addrIllusionSpellPractice[1], bytes([newIllusionSpellPractice]), 1)
+		self.pm.write_bytes(self.addrIllusionSpellPractice[2], bytes([newIllusionSpellPractice]), 1)
+		self.pm.write_bytes(self.addrIllusionSpellPractice[3], bytes([newIllusionSpellPractice]), 1)
+
 	def setMagicEasy(self, newMagicEasy):
 		self.pm.write_int(self.addrMagicEasy, newMagicEasy)
 
@@ -780,6 +720,12 @@ class gameController:
 		self.pm.write_bytes(self.addrMagicExtra[1], bytes([newMagicExtra]), 1)
 		self.pm.write_bytes(self.addrMagicExtra[2], bytes([newMagicExtra]), 1)
 		self.pm.write_bytes(self.addrMagicExtra[3], bytes([newMagicExtra]), 1)
+
+	def setMagicSpellPractice(self, newMagicSpellPractice):
+		self.pm.write_bytes(self.addrMagicSpellPractice[0], bytes([newMagicSpellPractice]), 1)
+		self.pm.write_bytes(self.addrMagicSpellPractice[1], bytes([newMagicSpellPractice]), 1)
+		self.pm.write_bytes(self.addrMagicSpellPractice[2], bytes([newMagicSpellPractice]), 1)
+		self.pm.write_bytes(self.addrMagicSpellPractice[3], bytes([newMagicSpellPractice]), 1)
 
 	def setDevilEasy(self, newDevilEasy):
 		self.pm.write_int(self.addrDevilEasy, newDevilEasy)
@@ -799,6 +745,12 @@ class gameController:
 		self.pm.write_bytes(self.addrDevilExtra[2], bytes([newDevilExtra]), 1)
 		self.pm.write_bytes(self.addrDevilExtra[3], bytes([newDevilExtra]), 1)
 
+	def setDevilSpellPractice(self, newDevilSpellPractice):
+		self.pm.write_bytes(self.addrDevilSpellPractice[0], bytes([newDevilSpellPractice]), 1)
+		self.pm.write_bytes(self.addrDevilSpellPractice[1], bytes([newDevilSpellPractice]), 1)
+		self.pm.write_bytes(self.addrDevilSpellPractice[2], bytes([newDevilSpellPractice]), 1)
+		self.pm.write_bytes(self.addrDevilSpellPractice[3], bytes([newDevilSpellPractice]), 1)
+
 	def setNetherEasy(self, newNetherEasy):
 		self.pm.write_int(self.addrNetherEasy, newNetherEasy)
 
@@ -816,6 +768,12 @@ class gameController:
 		self.pm.write_bytes(self.addrNetherExtra[1], bytes([newNetherExtra]), 1)
 		self.pm.write_bytes(self.addrNetherExtra[2], bytes([newNetherExtra]), 1)
 		self.pm.write_bytes(self.addrNetherExtra[3], bytes([newNetherExtra]), 1)
+
+	def setNetherSpellPractice(self, newNetherSpellPractice):
+		self.pm.write_bytes(self.addrNetherSpellPractice[0], bytes([newNetherSpellPractice]), 1)
+		self.pm.write_bytes(self.addrNetherSpellPractice[1], bytes([newNetherSpellPractice]), 1)
+		self.pm.write_bytes(self.addrNetherSpellPractice[2], bytes([newNetherSpellPractice]), 1)
+		self.pm.write_bytes(self.addrNetherSpellPractice[3], bytes([newNetherSpellPractice]), 1)
 
 	def setFpsText(self, newFpsText):
 		# If we have less than 8 character, we pad space character
@@ -870,6 +828,17 @@ class gameController:
 			elif difficulty == EXTRA:
 				self.setNetherExtra(newValue)
 
+	def setCharacterSpellPractice(self, character, access):
+		value = 0x80 if access else 0x00
+		if character == ILLUSION_TEAM:
+			self.setIllusionSpellPractice(value)
+		elif character == MAGIC_TEAM:
+			self.setMagicSpellPractice(value)
+		elif character == DEVIL_TEAM:
+			self.setDevilSpellPractice(value)
+		elif character == NETHER_TEAM:
+			self.setNetherSpellPractice(value)
+
 	def setInput(self, newInput):
 		self.pm.write_bytes(self.addrInput, bytes([newInput]), 1)
 
@@ -903,6 +872,21 @@ class gameController:
 			self.pm.write_bytes(self.addrHYGaugeHack, bytes([0x03]), 1)
 		else:
 			self.pm.write_bytes(self.addrHYGaugeHack, bytes([0x2B]), 1)
+
+	def setAllCharacterSpellCardAcquired(self, spell_id, value):
+		self.pm.write_bytes(self.addrAllCharacterSpellCard[spell_id]["acquired"], bytes([value]), 1)
+
+	def setAllCharacterSpellCardChallenged(self, spell_id, value):
+		self.pm.write_bytes(self.addrAllCharacterSpellCard[spell_id]["challenged"], bytes([value]), 1)
+
+	def setSpellCardAcquired(self, spell_id, character, value):
+		self.pm.write_bytes(self.addrSpellCards[spell_id][character]["acquired"], bytes([value]), 1)
+
+	def setSpellCardChallenged(self, spell_id, character, value):
+		self.pm.write_bytes(self.addrSpellCards[spell_id][character]["challenged"], bytes([value]), 1)
+
+	def setSpellCardUnlock(self, spell_id, character, value):
+		self.pm.write_bytes(self.addrSpellCards[spell_id][character]["unlocked"], bytes([value]), 1)
 
 	def resetBossPresent(self):
 		self.pm.write_bytes(self.addrIsBossPresent1, bytes([0]), 1)
@@ -963,7 +947,6 @@ class gameController:
 														0x5D,
 														0xC2, 0x08, 0x00]), 9)
 
-
 	def setCustomSoundId(self, soundId = 0x0D):
 		self.pm.write_bytes(self.addrCustomSoundId, bytes([soundId]), 1)
 
@@ -1019,3 +1002,16 @@ class gameController:
 			self.pm.write_bytes(self.addrFpsUpdate, bytes([0x68, 0xB8, 0xF3, 0x7C, 0x01]), 5)
 		else:
 			self.pm.write_bytes(self.addrFpsUpdate, bytes([0x68, 0x58, 0xE6, 0x7C, 0x01]), 5)
+
+	def showSplashScreens(self):
+		addr = self.pm.base_address+ADDR_STRUCT
+		value = int.from_bytes(self.pm.read_bytes(addr, 4))
+		flags = 0b1000000000000001
+		new_value = value|flags
+		if value != new_value:
+			self.pm.write_bytes(addr, new_value.to_bytes(4), 4)
+
+	def setLastWordHack(self):
+		for i in range(0, 17):
+			self.pm.write_bytes(self.addrLastWordConditions[i], bytes([0xEB]), 1)
+			self.pm.write_bytes(self.addrLastWordUnlock[i], bytes([0x00]), 1)

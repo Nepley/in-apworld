@@ -2,6 +2,7 @@ from .Variables import *
 from .gameController import gameController
 from .gameHandler import gameHandler
 from .Tools import *
+from .SpellCards import SPELL_CARDS_LIST
 
 class GuardRail:
 	def __init__(self, memory_controller: gameController, game_handler: gameHandler, options: dict):
@@ -51,7 +52,7 @@ class GuardRail:
 
 		if not result["error"]:
 			# We check if stages are unlocked correctly if we're in practice mode
-			if self.options["mode"] == PRACTICE_MODE:
+			if self.options["mode"] in PRACTICE_MODE:
 				stages = self.game_handler.stages
 				for character in CHARACTERS:
 					handler_stage = getIntFromBinaryArray(stages[character])
@@ -140,10 +141,24 @@ class GuardRail:
 					minimum_cursor = 0 if self.options['mode'] in NORMAL_MODE else 1
 
 					if not can_extra and self.options['mode'] not in NORMAL_MODE:
-						minimum_cursor += 2 # +1 When Spell Practice would be unlocked
+						minimum_cursor += 1 if self.options['mode'] in SPELL_PRACTICE_MODE else 2
 
 					if lock_down != minimum_cursor or lock_up != minimum_cursor:
 						result["error"] = True
 						result["message"] = f"Main menu cursor is not locked correctly. Minimum cursor should be {minimum_cursor}. Current locks are: {lock_down}, {lock_up}."
+
+		return result
+	
+	def check_spell_cards(self):
+		result = {"error": False, "message": ""}
+
+		# We check if the spell cards have been unlocked correctly
+		if self.game_handler.getGameMode() != IN_GAME:
+			for id in SPELL_CARDS_LIST.keys():
+				for character in CHARACTERS:
+					spell_card = (self.memory_controller.getSpellCardUnlocked(id, character) == 1)
+					if self.game_handler.spell_cards[id][character] != spell_card:
+						result["error"] = True
+						result["message"] = f"Spell card {id} for character {character} is not locked/unlocked properly."
 
 		return result

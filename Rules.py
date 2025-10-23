@@ -1,7 +1,8 @@
 from BaseClasses import MultiWorld
-from worlds.generic.Rules import add_rule
+from worlds.generic.Rules import add_rule, set_rule
 from .Variables import *
 from .Regions import get_regions
+from .SpellCards import SPELL_CARDS_LIST
 
 def constructProgressiveStageRule(player, state, nb_stage, mode, difficulty, character_list):
 	rule = state.count("Lower Difficulty", player) >= difficulty
@@ -72,13 +73,25 @@ def makeExtraRule(player, character_list, mode, extra):
 def makeCharacterRule(player, characters):
 	return lambda state: state.has_any(characters, player)
 
+def makeSpellCardRule(player, location, spellcard):
+	add_rule(location, lambda state: state.has(spellcard, player))
+
+def makeFinalSpellCardRule(player, location):
+	add_rule(location, lambda state: state.has("Brilliant Dragon Bullet", player)
+		  							and state.has("Buddhist Diamond", player)
+									and state.has("Salamander Shield", player)
+									and state.has("Life Spring Shield", player)
+									and state.has("Jeweled Branch of Hourai", player)
+			)
+
 def addDifficultyRule(player, difficulty, rule):
 	return lambda state: state.count("Lower Difficulty", player) >= difficulty and rule(state)
 
-def victoryCondition(player, state, normal_a, normal_b, extra, type):
+def victoryCondition(player, state, normal_a, normal_b, extra, treasure, type):
 	normal_a_victory = True
 	normal_b_victory = True
 	extra_victory = True
+	treasure_victory = True
 
 	if normal_a:
 		endings = []
@@ -110,7 +123,10 @@ def victoryCondition(player, state, normal_a, normal_b, extra, type):
 		elif type == ALL_CHARACTER_ENDING:
 			extra_victory = state.has_all(endings, player)
 
-	return normal_a_victory and normal_b_victory and extra_victory
+	if treasure:
+		treasure_victory = state.has(ENDING_TREASURE, player)
+
+	return normal_a_victory and normal_b_victory and extra_victory and treasure_victory
 
 def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: list, rule=None):
 	lifeMid = getattr(multiworld.worlds[player].options, "number_life_mid")
@@ -144,7 +160,7 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 			rule = makeResourcesRule(player, lifeEnd, bombsEnd, difficulty)
 		elif "Extra" in exit and "Stage" not in exit:
 			rule = makeResourcesRule(player, lifeExtra, bombsExtra, 0)
-		elif "Stage" in exit:
+		elif "Stage" in exit and "[SC]" not in exit:
 			if "Extra" not in exit:
 				if progressive_stage:
 					if "4A" in exit:
@@ -198,7 +214,7 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 								break
 
 				# If Extra is enabled linearly, we change it to apart
-				if extra == EXTRA_LINEAR and mode == PRACTICE_MODE and not progressive_stage:
+				if extra == EXTRA_LINEAR and mode in PRACTICE_MODE and not progressive_stage:
 					extra = EXTRA_APART
 
 				if "Extra" in exit:
@@ -211,7 +227,7 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 		targetRegion = multiworld.get_region(exit, player)
 		sourceRegion.connect(targetRegion, rule=rule)
 
-def set_rules(multiworld: MultiWorld, player: int):
+def set_rules(multiworld: MultiWorld, player: int, spell_cards: list, treasure_final_spell_card: str):
 	difficulty_check = getattr(multiworld.worlds[player].options, "difficulty_check")
 	extra = getattr(multiworld.worlds[player].options, "extra_stage")
 	endingRequired = getattr(multiworld.worlds[player].options, "ending_required")
@@ -226,25 +242,58 @@ def set_rules(multiworld: MultiWorld, player: int):
 	if mode in NORMAL_MODE:
 		both_stage_4 = False
 
+	if mode not in PRACTICE_MODE and mode not in NORMAL_MODE and goal != TREASURE_GOAL:
+		goal = TREASURE_GOAL
+	elif mode not in SPELL_PRACTICE_MODE and goal == TREASURE_GOAL:
+		goal = ENDING_FINAL_B
+
 	# Regions
-	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check)
+	all_spell_cards = spell_cards + [treasure_final_spell_card] if treasure_final_spell_card != -1 else []
+	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check, mode, all_spell_cards)
 
 	for name, data in regions.items():
 		if data["exits"]:
 			connect_regions(multiworld, player, name, data["exits"])
 
 		# Last Spell locations
-		if time and data["locations"]:
+		if time and data["locations"] and "SpellCard" not in name:
 			for location_name in data["locations"]:
 				if "Last Spell" in location_name:
 					location = multiworld.get_location(location_name, player)
 					add_rule(location, lambda state: state.has("Time Gain", player))
 
+		# SpellCards
+		if "[SC]" in name and data['locations']:
+			for location_name in data["locations"]:
+				location = multiworld.get_location(location_name, player)
+				item = location_name.split("] ")[1]
+				spell_id = item.split(" - ")[0]
+
+				if goal == TREASURE_GOAL and treasure_final_spell_card == spell_id:
+					makeFinalSpellCardRule(player, location)
+				else:
+					makeSpellCardRule(player, location, item)
+
 	# Endings
 
-	# Check if the Extra stage is enabled if the goal is set to the Extra stage.
-	if extra == NO_EXTRA and goal == ENDING_EXTRA:
-		goal = ENDING_FINAL_B_ITEM
+	# Failsafe
+	if goal in [ENDING_FINAL_A, ENDING_FINAL_B, ENDING_EXTRA, ENDING_ALL]:
+		# If we're not playing in normal or practice mode, that mean we are in spell card mode, and set the corresponding goal
+		if mode in PRACTICE_MODE or mode in NORMAL_MODE:
+			# Check if the Extra stage is enabled if the goal is set to the Extra stage.
+			if extra == NO_EXTRA and goal == ENDING_EXTRA:
+				goal = ENDING_FINAL_B
+		else:
+			goal = TREASURE_GOAL
+	elif goal in [TREASURE_GOAL]:
+		if mode not in SPELL_PRACTICE_MODE:
+			goal = ENDING_FINAL_B
 
 	# Win condition.
-	multiworld.completion_condition[player] = lambda state: victoryCondition(player, state, (goal in [ENDING_FINAL_A, ENDING_ALL]), (goal in [ENDING_FINAL_B, ENDING_ALL]), (goal in [ENDING_EXTRA, ENDING_ALL] and extra != NO_EXTRA), endingRequired)
+	multiworld.completion_condition[player] = lambda state: victoryCondition(player, state,
+																			(goal in [ENDING_FINAL_A, ENDING_ALL] and (mode in PRACTICE_MODE or mode in NORMAL_MODE)),
+																			(goal in [ENDING_FINAL_B, ENDING_ALL] and (mode in PRACTICE_MODE or mode in NORMAL_MODE)),
+																			(goal in [ENDING_EXTRA, ENDING_ALL] and extra != NO_EXTRA and (mode in PRACTICE_MODE or mode in NORMAL_MODE)),
+																			(goal in [TREASURE_GOAL] and mode in SPELL_PRACTICE_MODE),
+																			endingRequired
+																		)

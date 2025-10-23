@@ -126,6 +126,19 @@ class TouhouClientProcessor(ClientCommandProcessor):
 			logger.error("Limits cannot be accessed before connecting to the game and server")
 			return False
 
+	def _cmd_treasures(self):
+		"""Get the number of treasures collected and tell what the final Spell Card is."""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if self.ctx.options["goal"] != TREASURE_GOAL:
+				logger.error("No Treasure.")
+				return False
+			logger.info(f"Treasures collected: {self.ctx.handler.treasures}/5")
+			logger.info(f"Final Spell Card: {self.ctx.handler.final_spell_card}")
+			return True
+		else:
+			logger.error("Treasures cannot be accessed before connecting to the game and server")
+			return False
+
 class TouhouContext(CommonContext):
 	"""Touhou Game Context"""
 	def __init__(self, server_address: Optional[str], password: Optional[str]) -> None:
@@ -336,31 +349,31 @@ class TouhouContext(CommonContext):
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 205: # Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
+					if isExtraStageApart or (self.options['mode'] in PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage()
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 206: # [Illusion] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
+					if isExtraStageApart or (self.options['mode'] in PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(ILLUSION_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 207: # [Magic] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
+					if isExtraStageApart or (self.options['mode'] in PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(MAGIC_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 208: # [Devil] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
+					if isExtraStageApart or (self.options['mode'] in PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(DEVIL_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 209: # [Nether] Extra Stage
 					isExtraStageApart = self.options['extra_stage'] == EXTRA_APART
-					if isExtraStageApart or (self.options['mode'] == PRACTICE_MODE and not self.options['progressive_stage']):
+					if isExtraStageApart or (self.options['mode'] in PRACTICE_MODE and not self.options['progressive_stage']):
 						self.handler.unlockExtraStage(NETHER_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
@@ -560,6 +573,14 @@ class TouhouContext(CommonContext):
 						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 312 | 313 | 314 | 315 | 316: # Treasures
+					self.handler.addTreasure()
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 317: # Impossible Request Completed
+					await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 400: # 1 Power Point
 					self.handler.add1Power()
 					gotAnyItem = True
@@ -591,7 +612,13 @@ class TouhouContext(CommonContext):
 				case 508: # Extend Time Goal
 					self.traps["extend_time_goal"] += 1
 				case _:
-					logger.error(f"Unknown Item: {item}")
+					if item_id > 6000 and item_id < 7000: # Spell Card
+						spell_id = str(item_id)[1:]
+						self.handler.unlockSpellCard(spell_id)
+						gotAnyItem = True
+						self.msgQueue.append({"msg": "SC"+spell_id, "color": FLASHING_TEXT})
+					else:
+						logger.error(f"Unknown Item: {item}")
 
 		if gotAnyItem:
 			self.handler.playSound(0x19)
@@ -657,7 +684,7 @@ class TouhouContext(CommonContext):
 		"""
 		Give the resources to the player
 		"""
-		isNormalMode = self.options['mode'] == NORMAL_STATIC_MODE
+		isNormalMode = self.options['mode'] in NORMAL_MODE
 		return self.handler.initResources(isNormalMode)
 
 	def updateStageList(self):
@@ -666,8 +693,14 @@ class TouhouContext(CommonContext):
 		"""
 		mode = self.options['mode']
 
-		self.handler.updateStageList(mode == PRACTICE_MODE)
-		self.handler.updatePracticeScore(self.location_mapping, self.previous_location_checked)
+		if mode in PRACTICE_MODE or mode in NORMAL_MODE:
+			self.handler.updateStageList(mode in PRACTICE_MODE)
+
+		if mode in PRACTICE_MODE:
+			self.handler.updatePracticeScore(self.location_mapping, self.previous_location_checked)
+
+		if mode in SPELL_PRACTICE_MODE:
+			self.handler.updateSpellPracticeAccess(self.previous_location_checked)
 
 	def setRingLinkTag(self, active):
 		if active:
@@ -724,6 +757,10 @@ class TouhouContext(CommonContext):
 		Main loop that handles giving resources and updating locations.
 		"""
 		try:
+			# If we're not plyaing in Practice or Normal mode, we leave the loop since it would do nothing
+			if self.options['mode'] not in PRACTICE_MODE and self.options['mode'] not in NORMAL_MODE:
+				return
+
 			bossPresent = False
 			currentMode = -1 # -1: No mode, 0: In Game, 1: In Menu
 			currentLives = 0
@@ -733,6 +770,7 @@ class TouhouContext(CommonContext):
 			currentScore = 0
 			currentContinue = 0
 			currentStage = 0
+			previous_menu = 0
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.5)
@@ -743,6 +781,10 @@ class TouhouContext(CommonContext):
 
 				# Mode Check
 				if(gameMode == IN_GAME and not noCheck):
+					# If we are in spell practice, we do nothing
+					if previous_menu == SPELL_CARD_STAGE_SELECT:
+						continue
+
 					# A level has started
 					if(currentMode != 0):
 						currentMode = 0
@@ -792,7 +834,7 @@ class TouhouContext(CommonContext):
 								bossPresent = False
 
 					# If we're in practice mode and a boss spawn while there is no more boss in the stage, it's not normal and we stop sending checks
-					if (self.options['mode'] == PRACTICE_MODE and bossCounter > nbBoss):
+					if (self.options['mode'] in PRACTICE_MODE and bossCounter > nbBoss):
 						noCheck = True
 
 					# If the stage has changed and we're in normal mode, we reset some values
@@ -816,7 +858,9 @@ class TouhouContext(CommonContext):
 						currentMode = 1
 						resourcesGiven = False
 						noCheck = False # We enable the checks once we're in the menu
-					self.updateStageList()
+					menu = self.handler.getMenu()
+					if menu > 0 and menu < 20:
+						previous_menu = menu
 		except Exception as e:
 			logger.error(f"Main ERROR:")
 			logger.error(traceback.format_exc())
@@ -846,6 +890,12 @@ class TouhouContext(CommonContext):
 				if game_mode == -2:
 					continue
 
+				try:
+					# We force the save to act like he had already show the splash screens
+					self.handler.SetSplashScreenToShown()
+				except Exception as e:
+						pass
+
 				if game_mode != IN_GAME:
 					menu = self.handler.getMenu()
 					if menu == -1:
@@ -861,13 +911,14 @@ class TouhouContext(CommonContext):
 					if menu in [NORMAL_DIFFICULTY_MENU, PRACTICE_DIFFICULTY_MENU]:
 						self.minimalCursor = -1
 					# If we're in the main menu and we play in practice mode, we lock the access to normal mode
-					elif menu == MAIN_MENU and mode == PRACTICE_MODE:
+					elif menu == MAIN_MENU and mode not in NORMAL_MODE:
 						# 1 If we have access to the extra stage, 2 if we don't
-						self.minimalCursor = 1 if self.handler.canExtra() else 3
+						self.minimalCursor = 1 if self.handler.canExtra() else (2 if mode in SPELL_PRACTICE_MODE else 3)
 					else:
 						self.minimalCursor = 0
 
 					try:
+						self.updateStageList()
 						self.handler.updateExtraUnlock(not self.ExtraMenu)
 						self.handler.updateCursor(self.minimalCursor)
 					except Exception as e:
@@ -1020,6 +1071,7 @@ class TouhouContext(CommonContext):
 			inLevel = False
 			currentMisses = 0
 			nb_death = 0
+			previous_menu = 0
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				if(self.death_link_is_active):
@@ -1045,6 +1097,11 @@ class TouhouContext(CommonContext):
 					if self.pending_death_link and not onGoingDeathLink:
 						onGoingDeathLink = True
 
+					# If we're in Spell Practice, we check if the Player State is 3, if it is, we remove the potential on going death link
+					if onGoingDeathLink and previous_menu == SPELL_CARD_STAGE_SELECT and self.handler.getPlayerState() == 3:
+						onGoingDeathLink = False
+						self.pending_death_link = False
+
 					# If a misses has been added, that mean the player has been killed and we check if it was because of the death link
 					# (Receiving a death link is checked by misses as it's more reliable and the player could have deathbomb the death link)
 					if currentMisses < self.handler.getMisses():
@@ -1065,6 +1122,9 @@ class TouhouContext(CommonContext):
 					elif self.pending_death_link:
 						await self.handler.killPlayer()
 				else:
+					menu = self.handler.getMenu()
+					if menu > 0 and menu < 20:
+						previous_menu = menu
 					inLevel = False
 		except Exception as e:
 			logger.error(f"DeathLink ERROR: {e}")
@@ -1138,6 +1198,7 @@ class TouhouContext(CommonContext):
 		"""
 		Loop that handles the guard rail
 		"""
+		mode = self.options['mode']
 		guard_rail = GuardRail(self.handler.gameController, self.handler, self.options)
 		while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 			try:
@@ -1153,9 +1214,46 @@ class TouhouContext(CommonContext):
 				result = guard_rail.check_menu_lock()
 				if result["error"]:
 					logger.error(f"Menu Lock ERROR: {result['message']}")
+
+				# if mode in SPELL_PRACTICE_MODE:
+				# 	result = guard_rail.check_spell_cards()
+				# 	if result["error"]:
+				# 		logger.error(f"Spell Card ERROR: {result['message']}")
 			except Exception as e:
 				logger.error(f"GuardRail ERROR: {e}")
 				logger.error(traceback.format_exc())
+
+	async def spell_card_loop(self):
+		"""
+		Loop that handles spell cards
+		"""
+		try:
+			# If we're not playing in spell practice, we leave the loop since it would do nothing
+			if self.options['mode'] not in SPELL_PRACTICE_MODE:
+				return
+
+			if self.options['treasure_final_spell_card']:
+				self.handler.setFinalSpellCard(self.options['treasure_final_spell_card'])
+
+			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+				await asyncio.sleep(1)
+				spell_card_acquired = self.handler.getSpellCardAcquired()
+				spell_card_acquired_in_game = self.handler.getCurrentSpellCardAcquired()
+				new_spell_cards = []
+				for id, spell in spell_card_acquired.items():
+					for character in CHARACTERS:
+						if spell[character] != spell_card_acquired_in_game[id][character]:
+							self.handler.setSpellCardAcquired(id, character)
+							if spell[character]:
+								item_id = STARTING_ID + int("6"+str(character)+id)
+								new_spell_cards.append(item_id)
+
+				if new_spell_cards:
+					await self.send_msgs([{"cmd": 'LocationChecks', "locations": new_spell_cards}])
+		except Exception as e:
+			logger.error(f"SpellCard ERROR: {e}")
+			logger.error(traceback.format_exc())
+			self.inError = True
 
 	async def connect_to_game(self):
 		"""
@@ -1224,6 +1322,7 @@ async def game_watcher(ctx: TouhouContext):
 			asyncio.create_task(ctx.guard_rail_loop())
 			asyncio.create_task(ctx.death_link_loop())
 			asyncio.create_task(ctx.ring_link_loop())
+			asyncio.create_task(ctx.spell_card_loop())
 
 			# We update the locations checked if there was any location that was already checked before the connection
 			await ctx.update_locations_checked()

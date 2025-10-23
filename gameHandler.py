@@ -3,6 +3,7 @@ from .Variables import *
 from .gameController import gameController
 from .Tools import *
 import asyncio
+from .SpellCards import SPELL_CARDS_LIST
 
 class gameHandler:
 	"""Class keeping track of what's unlock for the game and handling interaction with the game."""
@@ -12,6 +13,9 @@ class gameHandler:
 	endings = None
 	stages = None
 	continues = None
+	spell_cards = None
+	final_spell_card = None
+	treasures = 0
 
 	difficulties = None
 	characters = None
@@ -76,7 +80,7 @@ class gameHandler:
 
 		# We check each locations to see which one has been done
 		for id, location_data in locations.items():
-			if id in checked_location:
+			if id in checked_location and id < STARTING_ID + 60000:
 				character = location_data[0]
 				stage = location_data[1]
 				counter = location_data[2]
@@ -120,6 +124,29 @@ class gameHandler:
 		else:
 			for characters in CHARACTERS:
 				self.gameController.setCharacterDifficulty(characters, EXTRA, 0x00)
+
+	def updateSpellPracticeAccess(self, checked_location):
+		"""
+		Update access to the Spell Practice
+		"""
+		for character in CHARACTERS:
+			has_access = self.characters[character]
+			self.gameController.setCharacterSpellPractice(character, has_access)
+
+		for spell in self.spell_cards:
+			for character in CHARACTERS:
+				value = 1 if self.spell_cards[spell][character] else 0
+				self.gameController.setSpellCardUnlock(spell, character, value)
+				item_id = STARTING_ID + int("6"+str(character)+spell)
+
+				# If the spell card has been checked but the acquired value in game is at 0, we bump it to 1
+				if item_id in checked_location and self.gameController.getSpellCardAcquired(spell, character) == 0:
+					self.gameController.setSpellCardChallenged(spell, character, 1)
+					self.gameController.setSpellCardAcquired(spell, character, 1)
+					all_character_challenged = self.gameController.getAllCharacterSpellCardChallenged(spell)
+					self.gameController.setAllCharacterSpellCardChallenged(spell, all_character_challenged+1)
+					all_character_acquired = self.gameController.getAllCharacterSpellCardAcquired(spell)
+					self.gameController.setAllCharacterSpellCardAcquired(spell, all_character_acquired+1)
 
 	#
 	# Boss
@@ -226,6 +253,9 @@ class gameHandler:
 	def getCharactersState(self):
 		return self.characters
 
+	def getSpellCardAcquired(self):
+		return self.spell_cards_acquired
+
 	#
 	# Get Games Functions
 	#
@@ -276,6 +306,28 @@ class gameHandler:
 
 	def getCurrentCharacter(self):
 		return self.gameController.getCharacter()
+
+	def getCurrentSpellCardAcquired(self):
+		spell_cards = {}
+
+		for id in self.spell_cards.keys():
+			spell_cards[id] = {}
+			for character in CHARACTERS:
+				spell_cards[id][character] = self.gameController.getSpellCardAcquired(id, character) == 1
+
+		return spell_cards
+
+	def getSpellCardUnlocked(self, spell_id):
+		unlocked = False
+		for character in CHARACTERS:
+			if self.gameController.getSpellCardUnlocked(spell_id, character) == 1:
+				unlocked = True
+				break
+
+		return unlocked
+
+	def getPlayerState(self):
+		return self.gameController.getPlayerState()
 
 	#
 	# Set Items Functions
@@ -361,6 +413,12 @@ class gameHandler:
 	def addEnding(self, character, type):
 		self.endings[character][type] += 1
 
+	def addTreasure(self):
+		self.treasures += 1
+
+		if self.treasures >= 5:
+			self.unlockSpellCard(self.final_spell_card)
+
 	def unlockDifficulty(self, difficulty):
 		self.difficulties[difficulty] = True
 
@@ -399,6 +457,17 @@ class gameHandler:
 		if limit >= 0 and limit <= 8:
 			self.limitBombs = limit
 			self.gameController.setStartingBombs(self.getBombs())
+
+	def unlockSpellCard(self, spell_id):
+		for character in CHARACTERS:
+			self.spell_cards[spell_id][character] = True
+
+	def setSpellCardAcquired(self, spell_id, character):
+		self.spell_cards_acquired[spell_id][character] = True
+		self.gameController.setSpellCardAcquired(spell_id, character, 1)
+
+	def setFinalSpellCard(self, spell_id):
+		self.final_spell_card = spell_id
 
 	#
 	# Traps
@@ -481,6 +550,8 @@ class gameHandler:
 		self.gameController.initStageSelectHack()
 		self.gameController.setAllClearStats(0xFF)
 		self.gameController.setTimeGain(False)
+		self.setLockToSpellPractice()
+		self.gameController.setLastWordHack()
 
 	def reset(self):
 		"""
@@ -526,6 +597,17 @@ class gameHandler:
 		self.lastSpeeds = [0, 0, 0, 0]
 
 		self.firstCharacterUnlocked = False
+
+		self.spell_cards = {}
+		self.spell_cards_acquired = {}
+		self.treasures = 0
+
+		for id in SPELL_CARDS_LIST.keys():
+			self.spell_cards[id] = {}
+			self.spell_cards_acquired[id] = {}
+			for character in CHARACTERS:
+				self.spell_cards[id][character] = False
+				self.spell_cards_acquired[id][character] = False
 
 	def playSound(self, soundId):
 		self.gameController.setCustomSoundId(soundId)
@@ -616,3 +698,18 @@ class gameHandler:
 			possible = False
 
 		return possible
+
+	def setLockToSpellPractice(self):
+		for character in CHARACTERS:
+			self.gameController.setCharacterSpellPractice(character, False)
+
+		for spell in self.spell_cards:
+			self.gameController.setAllCharacterSpellCardAcquired(spell, 0)
+			self.gameController.setAllCharacterSpellCardChallenged(spell, 0)
+			for character in CHARACTERS:
+				self.gameController.setSpellCardAcquired(spell, character, 0)
+				self.gameController.setSpellCardChallenged(spell, character, 0)
+				self.gameController.setSpellCardUnlock(spell, character, 0)
+
+	def SetSplashScreenToShown(self):
+		self.gameController.showSplashScreens()
