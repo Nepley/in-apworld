@@ -164,7 +164,7 @@ def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_che
 	if mode in SPELL_PRACTICE_MODE:
 		for character in characters:
 			regions[character]["exits"].append(f"[{character}] SpellCard")
-			regions[f"[{character}] SpellCard"] = {"locations": [], "exits": [f"[{character}][SC] Stage 1", f"[{character}][SC] Stage 2", f"[{character}][SC] Stage 3", f"[{character}][SC] Stage 4A", f"[{character}][SC] Stage 4B", f"[{character}][SC] Stage 5", f"[{character}][SC] Stage 6A", f"[{character}][SC] Stage 6B", f"[{character}][SC] Stage Extra", f"[{character}][SC] Last Word"]}
+			regions[f"[{character}] SpellCard"] = {"locations": [], "exits": [f"[{character}][SC] Stage 1", f"[{character}][SC] Stage 2", f"[{character}][SC] Stage 3", f"[{character}][SC] Stage 4A", f"[{character}][SC] Stage 4B", f"[{character}][SC] Stage 5", f"[{character}][SC] Stage 6A", f"[{character}][SC] Stage 6B", f"[{character}][SC] Extra", f"[{character}][SC] Last Word"]}
 
 			# Init Stages region
 			for stage in regions[f"[{character}] SpellCard"]["exits"]:

@@ -354,7 +354,7 @@ class TWorld(World):
 
 				# Placing treasures
 				if treasure_location == TREASURE_ON_KAGUYA:
-					min_spell = 184
+					min_spell = 152
 					max_spell = 191
 					spell_list = []
 					spell_chosen = []

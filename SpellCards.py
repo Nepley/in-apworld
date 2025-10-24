@@ -5922,7 +5922,7 @@ SPELL_CARDS_LIST = {
 	},
 	"192": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Past \"Old History of an Untrodden Land -Old History-\"",
 		"all_character_addresses": {
 			"acquired": 19043904,
@@ -5953,7 +5953,7 @@ SPELL_CARDS_LIST = {
 	},
 	"193": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Reincarnation \"Ichijou Returning Bridge\"",
 		"all_character_addresses": {
 			"acquired": 19044460,
@@ -5984,7 +5984,7 @@ SPELL_CARDS_LIST = {
 	},
 	"194": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Future \"New History of Fantasy -Next History-\"",
 		"all_character_addresses": {
 			"acquired": 19045016,
@@ -6015,7 +6015,7 @@ SPELL_CARDS_LIST = {
 	},
 	"195": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Statute of Limitations \"Curse of Tsuki no Iwakasa\"",
 		"all_character_addresses": {
 			"acquired": 19045572,
@@ -6046,7 +6046,7 @@ SPELL_CARDS_LIST = {
 	},
 	"196": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Undying \"Fire Bird -Feng Wing Ascension-\"",
 		"all_character_addresses": {
 			"acquired": 19046128,
@@ -6077,7 +6077,7 @@ SPELL_CARDS_LIST = {
 	},
 	"197": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Fujiwara \"Wounds of Metsuzai Temple\"",
 		"all_character_addresses": {
 			"acquired": 19046684,
@@ -6108,7 +6108,7 @@ SPELL_CARDS_LIST = {
 	},
 	"198": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Undying \"Xu Fu's Dimension\"",
 		"all_character_addresses": {
 			"acquired": 19047240,
@@ -6139,7 +6139,7 @@ SPELL_CARDS_LIST = {
 	},
 	"199": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Expiation \"Honest Man's Death\"",
 		"all_character_addresses": {
 			"acquired": 19047796,
@@ -6170,7 +6170,7 @@ SPELL_CARDS_LIST = {
 	},
 	"200": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Hollow Being \"Wu\"",
 		"all_character_addresses": {
 			"acquired": 19048352,
@@ -6201,7 +6201,7 @@ SPELL_CARDS_LIST = {
 	},
 	"201": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Inextinguishable \"Phoenix's Tail\"",
 		"all_character_addresses": {
 			"acquired": 19048908,
@@ -6232,7 +6232,7 @@ SPELL_CARDS_LIST = {
 	},
 	"202": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "Hourai \"South Wind, Clear Sky -Fujiyama Volcano-\"",
 		"all_character_addresses": {
 			"acquired": 19049464,
@@ -6263,7 +6263,7 @@ SPELL_CARDS_LIST = {
 	},
 	"203": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "\"Possessed by Phoenix\"",
 		"all_character_addresses": {
 			"acquired": 19050020,
@@ -6294,7 +6294,7 @@ SPELL_CARDS_LIST = {
 	},
 	"204": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "\"Hourai Doll\"",
 		"all_character_addresses": {
 			"acquired": 19050576,
@@ -6325,7 +6325,7 @@ SPELL_CARDS_LIST = {
 	},
 	"205": {
 		"difficulty": 4,
-		"stage": "Stage Extra",
+		"stage": "Extra",
 		"name": "\"Imperishable Shooting\"",
 		"all_character_addresses": {
 			"acquired": 19051132,
