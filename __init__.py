@@ -314,7 +314,7 @@ class TWorld(World):
 					extra = EXTRA_APART
 
 		# Extra
-		if extra == EXTRA_APART:
+		if extra == EXTRA_APART and (mode in PRACTICE_MODE or mode in NORMAL_MODE):
 			for stage in extra_stages:
 				quantity = stage['data'].max_quantity
 
