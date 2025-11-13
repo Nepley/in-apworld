@@ -116,22 +116,23 @@ class GuardRail:
 					for character in CHARACTERS:
 						characterExtraAccess = self.memory_controller.getCharacterDifficulty(character, EXTRA)
 
-						if all(x==characterExtraAccess[0] for x in characterExtraAccess):
-							characterUnlocked = True if characterExtraAccess[0] == 0xFF else False
-							characterLogicallyUnlocked = self.game_handler.characters[character]
-							characterHasExtra = self.game_handler.characters[character] and self.game_handler.hasExtra[character]
+						if characterExtraAccess:
+							if all(x==characterExtraAccess[0] for x in characterExtraAccess):
+								characterUnlocked = True if characterExtraAccess[0] == 0xFF else False
+								characterLogicallyUnlocked = self.game_handler.characters[character]
+								characterHasExtra = self.game_handler.characters[character] and self.game_handler.hasExtra[character]
 
-							if menu == EXTRA_CHARACTER_MENU:
-								if characterUnlocked != characterHasExtra:
-									result["error"] = True
-									result["message"] = f"Character {character} Extra access is not locked or unlocked correctly. Extra Logical state: {characterLogicallyUnlocked}. Current state: {characterHasExtra}."
+								if menu == EXTRA_CHARACTER_MENU:
+									if characterUnlocked != characterHasExtra:
+										result["error"] = True
+										result["message"] = f"Character {character} Extra access is not locked or unlocked correctly. Extra Logical state: {characterLogicallyUnlocked}. Current state: {characterHasExtra}."
+								else:
+									if characterUnlocked != characterLogicallyUnlocked:
+										result["error"] = True
+										result["message"] = f"Character {character} is not locked or unlocked correctly. Logical state: {characterLogicallyUnlocked}. Current state: {characterUnlocked}."
 							else:
-								if characterUnlocked != characterLogicallyUnlocked:
-									result["error"] = True
-									result["message"] = f"Character {character} is not locked or unlocked correctly. Logical state: {characterLogicallyUnlocked}. Current state: {characterUnlocked}."
-						else:
-							result["error"] = True
-							result["message"] = f"Character {character} unlock are not all equals. Easy: {characterExtraAccess[0]}, Normal: {characterExtraAccess[1]}, Hard: {characterExtraAccess[2]}, Lunatic: {characterExtraAccess[3]}"
+								result["error"] = True
+								result["message"] = f"Character {character} unlock are not all equals. Easy: {characterExtraAccess[0]}, Normal: {characterExtraAccess[1]}, Hard: {characterExtraAccess[2]}, Lunatic: {characterExtraAccess[3]}"
 
 				# If we're in the main menu, we check if the extra stage and normal mode are locked or unlocked correctly
 				elif menu == MAIN_MENU:
@@ -139,8 +140,9 @@ class GuardRail:
 					lock_down = self.memory_controller.getMinimumCursorDown()
 					lock_up = self.memory_controller.getMinimumCursorUp()
 					minimum_cursor = 0 if self.options['mode'] in NORMAL_MODE else 1
+					solo_extra_access = self.options['characters'] in [SOLO_ONLY, ALL_CHARACTER] and self.game_handler.canSoloExtra()
 
-					if not can_extra and self.options['mode'] not in NORMAL_MODE:
+					if (not can_extra and not solo_extra_access) and self.options['mode'] not in NORMAL_MODE:
 						minimum_cursor += 1 if self.options['mode'] in SPELL_PRACTICE_MODE else 2
 
 					if lock_down != minimum_cursor or lock_up != minimum_cursor:
@@ -148,7 +150,7 @@ class GuardRail:
 						result["message"] = f"Main menu cursor is not locked correctly. Minimum cursor should be {minimum_cursor}. Current locks are: {lock_down}, {lock_up}."
 
 		return result
-	
+
 	def check_spell_cards(self):
 		result = {"error": False, "message": ""}
 

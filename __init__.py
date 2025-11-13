@@ -32,23 +32,38 @@ class TWorld(World):
 	item_name_to_id = {name: data.code for name, data in item_table.items()}
 	location_name_to_id = {name: id for name, id in location_table.items()}
 
-	spell_cards = []
-	treasures_locations = []
-	treasure_final_spell_card = -1
-
 	def generate_early(self):
+		self.spell_cards = []
+		self.treasures_locations = []
+		self.treasure_final_spell_card = -1
+		self.capture_spell_cards_list = []
+		self.capture_spell_cards_count = 0
+		self.nb_treasure_not_placed = 0
+		self.spell_cards_teams = CHARACTERS_LIST
+
 		mode = getattr(self.options, "mode")
 		spell_card_difficulties = getattr(self.options, "spell_card_difficulties")
 		spell_card_stages = getattr(self.options, "spell_card_stages")
 		max_spell_card_count = getattr(self.options, "max_spell_card_count")
 		treasure_final_spell_card = getattr(self.options, "treasure_final_spell_card")
 		treasure_location = getattr(self.options, "treasure_location")
+		capture_spell_cards_stage = getattr(self.options, "capture_spell_cards_stage")
+		self.capture_spell_cards_count = getattr(self.options, "capture_spell_cards_count")
+		characters = getattr(self.options, "characters")
+		spell_cards_teams = getattr(self.options, "spell_cards_teams")
+		self.characters_list = []
+
 		goal = getattr(self.options, "goal")
+
+		# Failsafe goal/mode combination
+		if goal in SPELL_GOALS and mode not in SPELL_PRACTICE_MODE:
+			self.options.goal.value = self.options.goal.option_kaguya
+		elif goal in ENDINGS and (mode not in NORMAL_MODE and mode not in PRACTICE_MODE):
+			self.options.goal.value = self.options.goal.option_kaguya_treasures
 
 		if mode in SPELL_PRACTICE_MODE:
 			self.spell_cards = [spell_id for spell_id in SPELL_CARDS_LIST.keys()]
-			self.treasure_final_spell_card = -1
-			self.treasures_locations = []
+
 			# Failsafe
 			if not spell_card_difficulties:
 				spell_card_difficulties = ["Easy", "Normal", "Hard", "Lunatic", "Extra"]
@@ -56,8 +71,16 @@ class TWorld(World):
 			if not spell_card_stages:
 				spell_card_stages = ["Stage 1", "Stage 2", "Stage 3", "Stage 4A", "Stage 4B", "Stage 5", "Stage 6A", "Stage 6B", "Extra", "Last Word"]
 
-			if mode not in PRACTICE_MODE and mode not in NORMAL_MODE and goal != TREASURE_GOAL:
+			if goal == CAPTURE_GOAL and not capture_spell_cards_stage:
+				capture_spell_cards_stage = ["Stage 1", "Stage 2", "Stage 3", "Stage 4A", "Stage 4B", "Stage 5", "Stage 6A", "Stage 6B", "Extra", "Last Word"]
+
+			if mode not in PRACTICE_MODE and mode not in NORMAL_MODE and goal not in SPELL_GOALS:
 				goal = TREASURE_GOAL
+
+			# If we do not have all 4 teams enabled for spell practice, we filter them to get the number needed
+			if spell_cards_teams < 4 and characters != SOLO_ONLY:
+				self.random.shuffle(self.spell_cards_teams)
+				self.spell_cards_teams = self.spell_cards_teams[:spell_cards_teams]
 
 			# We filter out the spell cards that are excluded
 			for id, spell in SPELL_CARDS_LIST.items():
@@ -144,21 +167,102 @@ class TWorld(World):
 
 					max_spell_card_count -= 5
 
+				# If treasure location is local, we set the treasure to be local_items
+				if treasure_location == TREASURE_ON_LOCAL:
+					treasures = get_items_by_category("Treasures").keys()
+					for treasure in treasures:
+						self.options.local_items.value.add(treasure)
+			elif goal == CAPTURE_GOAL:
+				# We force the accessibility to full
+				self.options.accessibility.value = self.options.accessibility.option_full
+
+				# If we're in Capture Spell Cards goal, we add the spell card to the capture list if it's in the selected stages
+				for spell_id in self.spell_cards:
+					if SPELL_CARDS_LIST[spell_id]["stage"] in capture_spell_cards_stage:
+						self.capture_spell_cards_list.append(spell_id)
+
 			# If we still have more spell cards than the maximum allowed, we remove some randomly
 			if len(self.spell_cards) > max_spell_card_count:
 				self.random.shuffle(self.spell_cards)
-				self.spell_cards = self.spell_cards[:max_spell_card_count]
+				# If we're in Capture Spell Cards goal, we remove first the spell cards that are not needed for the goal
+				if goal == CAPTURE_GOAL and len(self.capture_spell_cards_list) < len(self.spell_cards):
+					not_needed = [spell for spell in self.spell_cards if spell not in self.capture_spell_cards_list]
+					if len(not_needed) >= (len(self.spell_cards) - max_spell_card_count):
+						self.spell_cards = [spell for spell in self.spell_cards if spell not in not_needed[:len(self.spell_cards) - max_spell_card_count]]
+					else:
+						# If we don't have enough "not needed" spell cards, we remove all of them and then remove randomly the remaining needed spell cards
+						self.spell_cards = [spell for spell in self.spell_cards if spell not in not_needed]
+						self.spell_cards = self.spell_cards[:max_spell_card_count]
+				else:
+					self.spell_cards = self.spell_cards[:max_spell_card_count]
+
+				# We refill the capture spell cards list with the remaining spell cards
+				if goal == CAPTURE_GOAL:
+					self.capture_spell_cards_list = []
+					for spell_id in self.spell_cards:
+						if SPELL_CARDS_LIST[spell_id]["stage"] in capture_spell_cards_stage:
+							self.capture_spell_cards_list.append(spell_id)
 
 			# We put back the treasures locations into the spell cards pool
 			if self.treasures_locations:
 				self.spell_cards += self.treasures_locations
 
+			# If the total spell cards is less than the capture spell cards count, we adjust it
+			if goal == CAPTURE_GOAL and len(self.capture_spell_cards_list) < self.capture_spell_cards_count:
+				self.capture_spell_cards_count = len(self.capture_spell_cards_list)
+
 			# We sort the spell cards list
 			self.spell_cards.sort()
 
+			# We list characters available in spell practice
+			if characters == TEAM_ONLY:
+				self.characters_list = self.spell_cards_teams
+			elif characters == SOLO_ONLY:
+				self.characters_list = SOLO_CHARACTERS_LIST
+			elif characters == ALL_CHARACTER:
+				self.characters_list = self.spell_cards_teams + SOLO_CHARACTERS_LIST
+
 	def fill_slot_data(self) -> dict:
-		data = {option_name: getattr(self.options, option_name).value for option_name in self.options_dataclass.__dataclass_fields__.keys()}
-		data['treasure_final_spell_card'] = self.treasure_final_spell_card
+		data = {
+			"mode": self.options.mode.value,
+			"stage_unlock": self.options.stage_unlock.value,
+			"exclude_lunatic": self.options.exclude_lunatic.value,
+			"characters": self.options.characters.value,
+			"spell_cards_teams": self.spell_cards_teams,
+			"number_life_mid": self.options.number_life_mid.value,
+			"number_bomb_mid": self.options.number_bomb_mid.value,
+			"difficulty_mid": self.options.difficulty_mid.value,
+			"number_life_end": self.options.number_life_end.value,
+			"number_bomb_end": self.options.number_bomb_end.value,
+			"difficulty_end": self.options.difficulty_end.value,
+			"extra_stage": self.options.extra_stage.value,
+			"number_life_extra": self.options.number_life_extra.value,
+			"number_bomb_extra": self.options.number_bomb_extra.value,
+			"difficulty_check": self.options.difficulty_check.value,
+			"check_multiple_difficulty": self.options.check_multiple_difficulty.value,
+			"time_check": self.options.time_check.value,
+			"time": self.options.time.value,
+			"both_stage_4": self.options.both_stage_4.value,
+			"starting_spell_card_count": self.options.starting_spell_card_count.value,
+			"spell_card_difficulties": self.options.spell_card_difficulties.value,
+			"spell_card_stages": self.options.spell_card_stages.value,
+			"max_spell_card_count": self.options.max_spell_card_count.value,
+			"goal": self.options.goal.value,
+			"ending_required": self.options.ending_required.value,
+			"treasure_location": self.options.treasure_location.value,
+			"treasure_final_spell_card": self.treasure_final_spell_card,
+			"capture_spell_cards_stage": self.options.capture_spell_cards_stage.value,
+			"capture_spell_cards_count": int(self.capture_spell_cards_count),
+			"death_link": self.options.death_link.value,
+			"death_link_trigger": self.options.death_link_trigger.value,
+			"death_link_amnesty": self.options.death_link_amnesty.value,
+			"ring_link": self.options.ring_link.value,
+			"limit_lives": self.options.limit_lives.value,
+			"limit_bombs": self.options.limit_bombs.value,
+			"capture_spell_cards_list": self.capture_spell_cards_list,
+			"nb_treasure_not_placed": self.nb_treasure_not_placed,
+		}
+
 		return data
 
 	def create_items(self):
@@ -175,6 +279,7 @@ class TWorld(World):
 		stage_unlock = getattr(self.options, "stage_unlock")
 		progressive_stage = getattr(self.options, "progressive_stage")
 		exclude_lunatic = getattr(self.options, "exclude_lunatic")
+		characters = getattr(self.options, "characters")
 		extra = getattr(self.options, "extra_stage")
 		both_stage_4 = getattr(self.options, "both_stage_4")
 		time = getattr(self.options, "time")
@@ -199,7 +304,7 @@ class TWorld(World):
 		if mode in NORMAL_MODE:
 			both_stage_4 = False
 
-		if mode not in PRACTICE_MODE and mode not in NORMAL_MODE and goal != TREASURE_GOAL:
+		if mode not in PRACTICE_MODE and mode not in NORMAL_MODE and goal not in SPELL_GOALS:
 			goal = TREASURE_GOAL
 		elif mode not in SPELL_PRACTICE_MODE and goal == TREASURE_GOAL:
 			goal = ENDING_FINAL_B
@@ -220,12 +325,12 @@ class TWorld(World):
 				continue
 
 			# Will be added manually later
-			if data.category == "Treasure":
+			if data.category == "Treasures":
 				treasures.append({"name": name, "data": data})
 				continue
 
 			# Will be added later
-			if data.category in ["[Progressive][Global] Stages", "[Progressive][Character] Stages"]:
+			if data.category in ["[Progressive][Global] Stages", "[Progressive][Character] Stages", "[Progressive][Solo Character] Stages"]:
 				progressive_stage_list.append({"name": name, "data": data})
 				continue
 
@@ -235,7 +340,7 @@ class TWorld(World):
 				continue
 
 			# Will be added later
-			if data.category in ["[Not Progressive][Global] Stages", "[Not Progressive][Character] Stages"]:
+			if data.category in ["[Not Progressive][Global] Stages", "[Not Progressive][Character] Stages", "[Not Progressive][Solo Character] Stages"]:
 				stages.append({"name": name, "data": data})
 				continue
 
@@ -261,7 +366,7 @@ class TWorld(World):
 				continue
 
 			# Will be added later
-			if data.category in ["[Global] Extra Stage", "[Character] Extra Stage"]:
+			if data.category in ["[Global] Extra Stage", "[Character] Extra Stage", "[Solo Character] Extra Stage"]:
 				extra_stages.append({"name": name, "data": data})
 				continue
 
@@ -272,11 +377,22 @@ class TWorld(World):
 			item_pool += [self.create_item(name) for _ in range(0, quantity)]
 
 		# Selecting starting character
-		starting_character = self.random.choice(character_list)
-		self.multiworld.push_precollected(self.create_item(starting_character))
-		character_list.remove(starting_character)
-		for character in character_list:
-			item_pool += [self.create_item(character) for _ in range(0, 1)]
+		if characters in [TEAM_ONLY, ALL_CHARACTER]:
+			# If we only have teams, we select one randomly to start with.
+			if characters == TEAM_ONLY:
+				# If spell practice is on, we take a character that is enabled in it.
+				if mode in SPELL_PRACTICE_MODE:
+					team = self.random.choice(self.spell_cards_teams)
+					starting_character = CHARACTER_TO_ITEM[team][0]
+				else:
+					starting_character = self.random.choice(character_list)
+				self.multiworld.push_precollected(self.create_item(starting_character))
+				character_list.remove(starting_character)
+
+			# If we're on Spell Practice only, we don't add characters who don't have check
+			for character in character_list:
+				if (mode in PRACTICE_MODE or mode in NORMAL_MODE) or ITEM_TO_CHARACTER[character] in self.spell_cards_teams:
+					item_pool += [self.create_item(character) for _ in range(0, 1)]
 
 		# Stages
 		if mode in PRACTICE_MODE:
@@ -284,7 +400,7 @@ class TWorld(World):
 				for stage in progressive_stage_list:
 					quantity = stage['data'].max_quantity
 					# If there is no extra stage or it's separated, we remove one stage
-					if extra != EXTRA_LINEAR:
+					if extra != EXTRA_LINEAR and stage['data'].category != "[Progressive][Solo Character] Stages":
 						quantity -= 1
 
 					# If there is only one stage 4, we remove one stage
@@ -294,19 +410,29 @@ class TWorld(World):
 					if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Progressive][Global] Stages":
 						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
 
-					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Progressive][Character] Stages":
+					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Progressive][Character] Stages" and characters in [TEAM_ONLY, ALL_CHARACTER]:
 						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Progressive][Solo Character] Stages" and characters in [SOLO_ONLY, ALL_CHARACTER]:
+						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+				# If we have solo character and we have Extra in linear, we add the Extra unlock for them
+				if extra == EXTRA_LINEAR and characters in [SOLO_ONLY, ALL_CHARACTER]:
+					item_pool.append(self.create_item("[Solo] Extra Stage"))
 			else:
 				for stage in stages:
 					quantity = stage['data'].max_quantity
 
-					if not both_stage_4 and stage["name"] in ["[Illusion Team] Stage 4A", "[Magic Team] Stage 4B", "[Devil Team] Stage 4A", "[Nether Team] Stage 4B"]:
+					if not both_stage_4 and stage["name"] in ["[Illusion Team] Stage 4A", "[Magic Team] Stage 4B", "[Devil Team] Stage 4B", "[Nether Team] Stage 4A", "[Reimu] Stage 4A", "[Yukari] Stage 4A", "[Marisa] Stage 4B", "[Alice] Stage 4B", "[Sakuya] Stage 4B", "[Remilia] Stage 4B", "[Youmu] Stage 4A", "[Yuyuko] Stage 4A"]:
 						continue
 
 					if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Not Progressive][Global] Stages":
 						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
 
-					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Not Progressive][Character] Stages":
+					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Not Progressive][Character] Stages" and characters in [TEAM_ONLY, ALL_CHARACTER]:
+						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+					if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Not Progressive][Solo Character] Stages" and characters in [SOLO_ONLY, ALL_CHARACTER]:
 						item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
 
 				# If Extra is enabled linearly, we change it to apart
@@ -321,7 +447,10 @@ class TWorld(World):
 				if stage_unlock == STAGE_GLOBAL and stage['data'].category == "[Global] Extra Stage":
 					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
 
-				if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Character] Extra Stage":
+				if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Character] Extra Stage" and characters in [TEAM_ONLY, ALL_CHARACTER]:
+					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
+
+				if stage_unlock == STAGE_BY_CHARACTER and stage['data'].category == "[Solo Character] Extra Stage" and characters in [SOLO_ONLY, ALL_CHARACTER]:
 					item_pool += [self.create_item(stage['name']) for _ in range(0, quantity)]
 
 		# Spell Card
@@ -340,7 +469,7 @@ class TWorld(World):
 				# We place the ending on the final spell card
 				ending_treasure = self.create_item(ENDING_TREASURE)
 				final_spell = SPELL_CARDS_LIST[self.treasure_final_spell_card]
-				for character in CHARACTERS_LIST:
+				for character in self.characters_list:
 					name = f"[{character}] {self.treasure_final_spell_card} - {final_spell['name']}"
 					self.multiworld.get_location(name, self.player).place_locked_item(ending_treasure)
 					number_placed_item += 1
@@ -367,18 +496,18 @@ class TWorld(World):
 					self.random.shuffle(spell_list)
 					for treasure in treasures:
 						item = self.create_item(treasure['name'])
-						character = self.random.choice(CHARACTERS_LIST)
+						character = self.random.choice(self.characters_list)
 						spell = self.random.choice(spell_list)
 
 						nb_try = 0
 						while [character, spell] in spell_chosen and nb_try < 100:
 							nb_try += 1
-							character = self.random.choice(CHARACTERS_LIST)
+							character = self.random.choice(self.characters_list)
 							spell = self.random.choice(spell_list)
 
 						# If we didn't manage to place the spell card, we add it to the local item pool
 						if nb_try >= 100:
-							self.options.local_items.value.add(treasure['name'])
+							self.nb_treasure_not_placed += 1
 							item_pool += [item for _ in range(0, 1)]
 							continue
 
@@ -401,18 +530,18 @@ class TWorld(World):
 					self.random.shuffle(spell_list)
 					for treasure in treasures:
 						item = self.create_item(treasure['name'])
-						character = self.random.choice(CHARACTERS_LIST)
+						character = self.random.choice(self.characters_list)
 						spell = self.random.choice(spell_list)
 
 						nb_try = 0
 						while [character, spell] in spell_chosen and nb_try < 100:
 							nb_try += 1
-							character = self.random.choice(CHARACTERS_LIST)
+							character = self.random.choice(self.characters_list)
 							spell = self.random.choice(spell_list)
 
 						# If we didn't manage to place the spell card, we add it to the local item pool
 						if nb_try >= 100:
-							self.options.local_items.value.add(treasure['name'])
+							self.nb_treasure_not_placed += 1
 							item_pool += [item for _ in range(0, 1)]
 							continue
 
@@ -421,11 +550,7 @@ class TWorld(World):
 						self.multiworld.get_location(name, self.player).place_locked_item(item)
 						spell_chosen.append([character, spell])
 						number_placed_item += 1
-				elif treasure_location == TREASURE_ON_LOCAL:
-					for treasure in treasures:
-						self.options.local_items.value.add(treasure['name'])
-						item_pool += [self.create_item(treasure['name']) for _ in range(0, treasure['data'].max_quantity)]
-				elif treasure_location == TREASURE_ON_ANYWHERE:
+				elif treasure_location == TREASURE_ON_LOCAL or treasure_location == TREASURE_ON_ANYWHERE:
 					for treasure in treasures:
 						item_pool += [self.create_item(treasure['name']) for _ in range(0, treasure['data'].max_quantity)]
 
@@ -468,30 +593,90 @@ class TWorld(World):
 			ending_extra_magic = self.create_item("[Magic Team] Ending - Mokou")
 			ending_extra_devil = self.create_item("[Devil Team] Ending - Mokou")
 			ending_extra_nether = self.create_item("[Nether Team] Ending - Mokou")
+			ending_final_a_reimu = self.create_item("[Reimu] Ending - Eirin")
+			ending_final_a_yukari = self.create_item("[Yukari] Ending - Eirin")
+			ending_final_a_marisa = self.create_item("[Marisa] Ending - Eirin")
+			ending_final_a_alice = self.create_item("[Alice] Ending - Eirin")
+			ending_final_a_sakuya = self.create_item("[Sakuya] Ending - Eirin")
+			ending_final_a_remilia = self.create_item("[Remilia] Ending - Eirin")
+			ending_final_a_youmu = self.create_item("[Youmu] Ending - Eirin")
+			ending_final_a_yuyuko = self.create_item("[Yuyuko] Ending - Eirin")
+			ending_final_b_reimu = self.create_item("[Reimu] Ending - Kaguya")
+			ending_final_b_yukari = self.create_item("[Yukari] Ending - Kaguya")
+			ending_final_b_marisa = self.create_item("[Marisa] Ending - Kaguya")
+			ending_final_b_alice = self.create_item("[Alice] Ending - Kaguya")
+			ending_final_b_sakuya = self.create_item("[Sakuya] Ending - Kaguya")
+			ending_final_b_remilia = self.create_item("[Remilia] Ending - Kaguya")
+			ending_final_b_youmu = self.create_item("[Youmu] Ending - Kaguya")
+			ending_final_b_yuyuko = self.create_item("[Yuyuko] Ending - Kaguya")
+			ending_extra_reimu = self.create_item("[Reimu] Ending - Mokou")
+			ending_extra_yukari = self.create_item("[Yukari] Ending - Mokou")
+			ending_extra_marisa = self.create_item("[Marisa] Ending - Mokou")
+			ending_extra_alice = self.create_item("[Alice] Ending - Mokou")
+			ending_extra_sakuya = self.create_item("[Sakuya] Ending - Mokou")
+			ending_extra_remilia = self.create_item("[Remilia] Ending - Mokou")
+			ending_extra_youmu = self.create_item("[Youmu] Ending - Mokou")
+			ending_extra_yuyuko = self.create_item("[Yuyuko] Ending - Mokou")
 
 			# If we have the extra stage and the extra boss is a potential goal
 			if extra and goal in [ENDING_EXTRA, ENDING_ALL]:
+				if characters in [TEAM_ONLY, ALL_CHARACTER]:
 					self.multiworld.get_location("[Illusion Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_illusion)
 					self.multiworld.get_location("[Magic Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_magic)
 					self.multiworld.get_location("[Devil Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_devil)
 					self.multiworld.get_location("[Nether Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_nether)
 					number_placed_item += 4
 
+				if characters in [SOLO_ONLY, ALL_CHARACTER]:
+					self.multiworld.get_location("[Reimu] Stage Extra Clear", self.player).place_locked_item(ending_extra_reimu)
+					self.multiworld.get_location("[Yukari] Stage Extra Clear", self.player).place_locked_item(ending_extra_yukari)
+					self.multiworld.get_location("[Marisa] Stage Extra Clear", self.player).place_locked_item(ending_extra_marisa)
+					self.multiworld.get_location("[Alice] Stage Extra Clear", self.player).place_locked_item(ending_extra_alice)
+					self.multiworld.get_location("[Sakuya] Stage Extra Clear", self.player).place_locked_item(ending_extra_sakuya)
+					self.multiworld.get_location("[Remilia] Stage Extra Clear", self.player).place_locked_item(ending_extra_remilia)
+					self.multiworld.get_location("[Youmu] Stage Extra Clear", self.player).place_locked_item(ending_extra_youmu)
+					self.multiworld.get_location("[Yuyuko] Stage Extra Clear", self.player).place_locked_item(ending_extra_yuyuko)
+					number_placed_item += 8
+
 			# If Eirin boss is a potential goal
 			if goal in [ENDING_FINAL_A, ENDING_ALL]:
+				if characters in [TEAM_ONLY, ALL_CHARACTER]:
 					self.multiworld.get_location("[Illusion Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_illusion)
 					self.multiworld.get_location("[Magic Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_magic)
 					self.multiworld.get_location("[Devil Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_devil)
 					self.multiworld.get_location("[Nether Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_nether)
 					number_placed_item += 4
 
+				if characters in [SOLO_ONLY, ALL_CHARACTER]:
+					self.multiworld.get_location("[Reimu] Stage 6A Clear", self.player).place_locked_item(ending_final_a_reimu)
+					self.multiworld.get_location("[Yukari] Stage 6A Clear", self.player).place_locked_item(ending_final_a_yukari)
+					self.multiworld.get_location("[Marisa] Stage 6A Clear", self.player).place_locked_item(ending_final_a_marisa)
+					self.multiworld.get_location("[Alice] Stage 6A Clear", self.player).place_locked_item(ending_final_a_alice)
+					self.multiworld.get_location("[Sakuya] Stage 6A Clear", self.player).place_locked_item(ending_final_a_sakuya)
+					self.multiworld.get_location("[Remilia] Stage 6A Clear", self.player).place_locked_item(ending_final_a_remilia)
+					self.multiworld.get_location("[Youmu] Stage 6A Clear", self.player).place_locked_item(ending_final_a_youmu)
+					self.multiworld.get_location("[Yuyuko] Stage 6A Clear", self.player).place_locked_item(ending_final_a_yuyuko)
+					number_placed_item += 8
+
 			# If Kaguya boss is a potential goal
 			if (not extra and goal == ENDING_EXTRA) or goal in [ENDING_FINAL_B, ENDING_ALL]:
+				if characters in [TEAM_ONLY, ALL_CHARACTER]:
 					self.multiworld.get_location("[Illusion Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_illusion)
 					self.multiworld.get_location("[Magic Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_magic)
 					self.multiworld.get_location("[Devil Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_devil)
 					self.multiworld.get_location("[Nether Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_nether)
 					number_placed_item += 4
+
+				if characters in [SOLO_ONLY, ALL_CHARACTER]:
+					self.multiworld.get_location("[Reimu] Stage 6B Clear", self.player).place_locked_item(ending_final_b_reimu)
+					self.multiworld.get_location("[Yukari] Stage 6B Clear", self.player).place_locked_item(ending_final_b_yukari)
+					self.multiworld.get_location("[Marisa] Stage 6B Clear", self.player).place_locked_item(ending_final_b_marisa)
+					self.multiworld.get_location("[Alice] Stage 6B Clear", self.player).place_locked_item(ending_final_b_alice)
+					self.multiworld.get_location("[Sakuya] Stage 6B Clear", self.player).place_locked_item(ending_final_b_sakuya)
+					self.multiworld.get_location("[Remilia] Stage 6B Clear", self.player).place_locked_item(ending_final_b_remilia)
+					self.multiworld.get_location("[Youmu] Stage 6B Clear", self.player).place_locked_item(ending_final_b_youmu)
+					self.multiworld.get_location("[Yuyuko] Stage 6B Clear", self.player).place_locked_item(ending_final_b_yuyuko)
+					number_placed_item += 8
 
 		if mode in SPELL_PRACTICE_MODE and duplicate_spell_cards > 0:
 			remaining_locations = total_locations - (len(item_pool) + number_placed_item)
@@ -534,8 +719,8 @@ class TWorld(World):
 		return TItem(name, classification, data.code, self.player)
 
 	def set_rules(self):
-		set_rules(self.multiworld, self.player, self.spell_cards, self.treasure_final_spell_card)
+		set_rules(self.multiworld, self.player, self.spell_cards, self.treasure_final_spell_card, self.capture_spell_cards_list, self.capture_spell_cards_count, self.spell_cards_teams)
 
 	def create_regions(self):
 		all_spell_cards = self.spell_cards + [self.treasure_final_spell_card] if self.treasure_final_spell_card != -1 else self.spell_cards
-		create_regions(self.multiworld, self.player, self.options, all_spell_cards)
+		create_regions(self.multiworld, self.player, self.options, all_spell_cards, self.spell_cards_teams)

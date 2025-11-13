@@ -48,6 +48,46 @@ class gameController:
 		self.addrNetherHard = self.pm.base_address+ADDR_NETHER_HARD
 		self.addrNetherLunatic = self.pm.base_address+ADDR_NETHER_LUNATIC
 
+		self.addrReimuEasy = self.pm.base_address+ADDR_REIMU_EASY
+		self.addrReimuNormal = self.pm.base_address+ADDR_REIMU_NORMAL
+		self.addrReimuHard = self.pm.base_address+ADDR_REIMU_HARD
+		self.addrReimuLunatic = self.pm.base_address+ADDR_REIMU_LUNATIC
+
+		self.addrYukariEasy = self.pm.base_address+ADDR_YUKARI_EASY
+		self.addrYukariNormal = self.pm.base_address+ADDR_YUKARI_NORMAL
+		self.addrYukariHard = self.pm.base_address+ADDR_YUKARI_HARD
+		self.addrYukariLunatic = self.pm.base_address+ADDR_YUKARI_LUNATIC
+
+		self.addrMarisaEasy = self.pm.base_address+ADDR_MARISA_EASY
+		self.addrMarisaNormal = self.pm.base_address+ADDR_MARISA_NORMAL
+		self.addrMarisaHard = self.pm.base_address+ADDR_MARISA_HARD
+		self.addrMarisaLunatic = self.pm.base_address+ADDR_MARISA_LUNATIC
+
+		self.addrAliceEasy = self.pm.base_address+ADDR_ALICE_EASY
+		self.addrAliceNormal = self.pm.base_address+ADDR_ALICE_NORMAL
+		self.addrAliceHard = self.pm.base_address+ADDR_ALICE_HARD
+		self.addrAliceLunatic = self.pm.base_address+ADDR_ALICE_LUNATIC
+
+		self.addrSakuyaEasy = self.pm.base_address+ADDR_SAKUYA_EASY
+		self.addrSakuyaNormal = self.pm.base_address+ADDR_SAKUYA_NORMAL
+		self.addrSakuyaHard = self.pm.base_address+ADDR_SAKUYA_HARD
+		self.addrSakuyaLunatic = self.pm.base_address+ADDR_SAKUYA_LUNATIC
+
+		self.addrRemiliaEasy = self.pm.base_address+ADDR_REMILIA_EASY
+		self.addrRemiliaNormal = self.pm.base_address+ADDR_REMILIA_NORMAL
+		self.addrRemiliaHard = self.pm.base_address+ADDR_REMILIA_HARD
+		self.addrRemiliaLunatic = self.pm.base_address+ADDR_REMILIA_LUNATIC
+
+		self.addrYoumuEasy = self.pm.base_address+ADDR_YOUMU_EASY
+		self.addrYoumuNormal = self.pm.base_address+ADDR_YOUMU_NORMAL
+		self.addrYoumuHard = self.pm.base_address+ADDR_YOUMU_HARD
+		self.addrYoumuLunatic = self.pm.base_address+ADDR_YOUMU_LUNATIC
+
+		self.addrYuyukoEasy = self.pm.base_address+ADDR_YUYUKO_EASY
+		self.addrYuyukoNormal = self.pm.base_address+ADDR_YUYUKO_NORMAL
+		self.addrYuyukoHard = self.pm.base_address+ADDR_YUYUKO_HARD
+		self.addrYuyukoLunatic = self.pm.base_address+ADDR_YUYUKO_LUNATIC
+
 		self.addrIllusionExtra = [self.pm.base_address+ADDR_ILLUSION_EXTRA[0], self.pm.base_address+ADDR_ILLUSION_EXTRA[1], self.pm.base_address+ADDR_ILLUSION_EXTRA[2], self.pm.base_address+ADDR_ILLUSION_EXTRA[3]]
 		self.addrMagicExtra = [self.pm.base_address+ADDR_MAGIC_EXTRA[0], self.pm.base_address+ADDR_MAGIC_EXTRA[1], self.pm.base_address+ADDR_MAGIC_EXTRA[2], self.pm.base_address+ADDR_MAGIC_EXTRA[3]]
 		self.addrDevilExtra = [self.pm.base_address+ADDR_DEVIL_EXTRA[0], self.pm.base_address+ADDR_DEVIL_EXTRA[1], self.pm.base_address+ADDR_DEVIL_EXTRA[2], self.pm.base_address+ADDR_DEVIL_EXTRA[3]]
@@ -78,6 +118,46 @@ class gameController:
 		self.addrNetherHardClear = self.pm.base_address+ADDR_NETHER_HARD_CLEAR
 		self.addrNetherLunaticClear = self.pm.base_address+ADDR_NETHER_LUNATIC_CLEAR
 
+		self.addrReimuEasyClear = self.pm.base_address+ADDR_REIMU_EASY_CLEAR
+		self.addrReimuNormalClear = self.pm.base_address+ADDR_REIMU_NORMAL_CLEAR
+		self.addrReimuHardClear = self.pm.base_address+ADDR_REIMU_HARD_CLEAR
+		self.addrReimuLunaticClear = self.pm.base_address+ADDR_REIMU_LUNATIC_CLEAR
+
+		self.addrYukariEasyClear = self.pm.base_address+ADDR_YUKARI_EASY_CLEAR
+		self.addrYukariNormalClear = self.pm.base_address+ADDR_YUKARI_NORMAL_CLEAR
+		self.addrYukariHardClear = self.pm.base_address+ADDR_YUKARI_HARD_CLEAR
+		self.addrYukariLunaticClear = self.pm.base_address+ADDR_YUKARI_LUNATIC_CLEAR
+
+		self.addrMarisaEasyClear = self.pm.base_address+ADDR_MARISA_EASY_CLEAR
+		self.addrMarisaNormalClear = self.pm.base_address+ADDR_MARISA_NORMAL_CLEAR
+		self.addrMarisaHardClear = self.pm.base_address+ADDR_MARISA_HARD_CLEAR
+		self.addrMarisaLunaticClear = self.pm.base_address+ADDR_MARISA_LUNATIC_CLEAR
+
+		self.addrAliceEasyClear = self.pm.base_address+ADDR_ALICE_EASY_CLEAR
+		self.addrAliceNormalClear = self.pm.base_address+ADDR_ALICE_NORMAL_CLEAR
+		self.addrAliceHardClear = self.pm.base_address+ADDR_ALICE_HARD_CLEAR
+		self.addrAliceLunaticClear = self.pm.base_address+ADDR_ALICE_LUNATIC_CLEAR
+
+		self.addrSakuyaEasyClear = self.pm.base_address+ADDR_SAKUYA_EASY_CLEAR
+		self.addrSakuyaNormalClear = self.pm.base_address+ADDR_SAKUYA_NORMAL_CLEAR
+		self.addrSakuyaHardClear = self.pm.base_address+ADDR_SAKUYA_HARD_CLEAR
+		self.addrSakuyaLunaticClear = self.pm.base_address+ADDR_SAKUYA_LUNATIC_CLEAR
+
+		self.addrRemiliaEasyClear = self.pm.base_address+ADDR_REMILIA_EASY_CLEAR
+		self.addrRemiliaNormalClear = self.pm.base_address+ADDR_REMILIA_NORMAL_CLEAR
+		self.addrRemiliaHardClear = self.pm.base_address+ADDR_REMILIA_HARD_CLEAR
+		self.addrRemiliaLunaticClear = self.pm.base_address+ADDR_REMILIA_LUNATIC_CLEAR
+
+		self.addrYoumuEasyClear = self.pm.base_address+ADDR_YOUMU_EASY_CLEAR
+		self.addrYoumuNormalClear = self.pm.base_address+ADDR_YOUMU_NORMAL_CLEAR
+		self.addrYoumuHardClear = self.pm.base_address+ADDR_YOUMU_HARD_CLEAR
+		self.addrYoumuLunaticClear = self.pm.base_address+ADDR_YOUMU_LUNATIC_CLEAR
+
+		self.addrYuyukoEasyClear = self.pm.base_address+ADDR_YUYUKO_EASY_CLEAR
+		self.addrYuyukoNormalClear = self.pm.base_address+ADDR_YUYUKO_NORMAL_CLEAR
+		self.addrYuyukoHardClear = self.pm.base_address+ADDR_YUYUKO_HARD_CLEAR
+		self.addrYuyukoLunaticClear = self.pm.base_address+ADDR_YUYUKO_LUNATIC_CLEAR
+
 		self.addrControllerHandle = self.pm.base_address+ADDR_CONTROLLER_HANDLER
 		self.addrInput = self.pm.base_address+ADDR_INPUT
 		self.addrGameMode = self.pm.base_address+ADDR_GAME_MODE
@@ -89,7 +169,7 @@ class gameController:
 		self.addrFocusCondition = self.pm.base_address+ADDR_FOCUS_CONDITION
 		self.addrAntiTemperHack = self.pm.base_address+ADDR_ANTI_TEMPER_HACK
 		self.addrCharacterDefaultCursorCondition = self.pm.base_address+ADDR_CHARACTER_DEFAULT_CURSOR_CONDITION
-		self.addrForceLockSoloCharacter = self.pm.base_address+ADDR_FORCE_LOCK_SOLO_CHARACTER
+		self.addrSoloCharacterConditions = [self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[0], self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[1], self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[2], self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[3]]
 		self.addrHYGaugeHack = self.pm.base_address+ADDR_HY_GAUGE_HACK
 
 		self.addrKillCondition = self.pm.base_address+ADDR_KILL_CONDITION
@@ -322,6 +402,382 @@ class gameController:
 					self.pm.base_address+ADDR_NETHER_LUNATIC_SCORE_6_A,
 					self.pm.base_address+ADDR_NETHER_LUNATIC_SCORE_6_B,
 				],
+			},
+			REIMU:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_1,
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_2,
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_3,
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_5,
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_REIMU_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_REIMU_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_1,
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_2,
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_3,
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_5,
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_REIMU_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_REIMU_LUNATIC_SCORE_6_B,
+				],
+			},
+			YUKARI:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_1,
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_2,
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_3,
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_5,
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_YUKARI_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_YUKARI_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_1,
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_2,
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_3,
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_5,
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_YUKARI_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_YUKARI_LUNATIC_SCORE_6_B,
+				],
+			},
+			MARISA:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_1,
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_2,
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_3,
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_5,
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_MARISA_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_MARISA_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_1,
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_2,
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_3,
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_5,
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_MARISA_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_MARISA_LUNATIC_SCORE_6_B,
+				],
+			},
+			ALICE:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_1,
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_2,
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_3,
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_5,
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_ALICE_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_ALICE_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_1,
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_2,
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_3,
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_5,
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_ALICE_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_ALICE_LUNATIC_SCORE_6_B,
+				],
+			},
+			SAKUYA:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_1,
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_2,
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_3,
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_5,
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_SAKUYA_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_SAKUYA_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_1,
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_2,
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_3,
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_5,
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_SAKUYA_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_SAKUYA_LUNATIC_SCORE_6_B,
+				],
+			},
+			REMILIA:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_1,
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_2,
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_3,
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_5,
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_REMILIA_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_REMILIA_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_1,
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_2,
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_3,
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_5,
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_REMILIA_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_REMILIA_LUNATIC_SCORE_6_B,
+				],
+			},
+			YOUMU:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_1,
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_2,
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_3,
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_5,
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_YOUMU_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_YOUMU_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_1,
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_2,
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_3,
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_5,
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_YOUMU_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_YOUMU_LUNATIC_SCORE_6_B,
+				],
+			},
+			YUYUKO:
+			{
+				EASY:
+				[
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_1,
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_2,
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_3,
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_4_A,
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_4_B,
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_5,
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_6_A,
+					self.pm.base_address+ADDR_YUYUKO_EASY_SCORE_6_B,
+				],
+				NORMAL:
+				[
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_1,
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_2,
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_3,
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_4_A,
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_4_B,
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_5,
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_6_A,
+					self.pm.base_address+ADDR_YUYUKO_NORMAL_SCORE_6_B,
+				],
+				HARD:
+				[
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_1,
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_2,
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_3,
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_4_A,
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_4_B,
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_5,
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_6_A,
+					self.pm.base_address+ADDR_YUYUKO_HARD_SCORE_6_B,
+				],
+				LUNATIC:
+				[
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_1,
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_2,
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_3,
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_4_A,
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_4_B,
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_5,
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_6_A,
+					self.pm.base_address+ADDR_YUYUKO_LUNATIC_SCORE_6_B,
+				],
 			}
 		}
 
@@ -489,6 +945,102 @@ class gameController:
 				int.from_bytes(self.pm.read_bytes(self.addrNetherSpellPractice[3], 1))
 			]
 
+	def getReimuEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrReimuEasy, 1))
+
+	def getReimuNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrReimuNormal, 1))
+
+	def getReimuHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrReimuHard, 1))
+
+	def getReimuLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrReimuLunatic, 1))
+
+	def getYukariEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYukariEasy, 1))
+
+	def getYukariNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYukariNormal, 1))
+
+	def getYukariHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYukariHard, 1))
+
+	def getYukariLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYukariLunatic, 1))
+
+	def getMarisaEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMarisaEasy, 1))
+
+	def getMarisaNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMarisaNormal, 1))
+
+	def getMarisaHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMarisaHard, 1))
+
+	def getMarisaLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrMarisaLunatic, 1))
+
+	def getAliceEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrAliceEasy, 1))
+
+	def getAliceNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrAliceNormal, 1))
+
+	def getAliceHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrAliceHard, 1))
+
+	def getAliceLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrAliceLunatic, 1))
+
+	def getSakuyaEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaEasy, 1))
+
+	def getSakuyaNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaNormal, 1))
+
+	def getSakuyaHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaHard, 1))
+
+	def getSakuyaLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrSakuyaLunatic, 1))
+
+	def getRemiliaEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrRemiliaEasy, 1))
+
+	def getRemiliaNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrRemiliaNormal, 1))
+
+	def getRemiliaHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrRemiliaHard, 1))
+
+	def getRemiliaLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrRemiliaLunatic, 1))
+
+	def getYoumuEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYoumuEasy, 1))
+
+	def getYoumuNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYoumuNormal, 1))
+
+	def getYoumuHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYoumuHard, 1))
+
+	def getYoumuLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYoumuLunatic, 1))
+
+	def getYuyukoEasy(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYuyukoEasy, 1))
+
+	def getYuyukoNormal(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYuyukoNormal, 1))
+
+	def getYuyukoHard(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYuyukoHard, 1))
+
+	def getYuyukoLunatic(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrYuyukoLunatic, 1))
+
 	def getInput(self):
 		return int.from_bytes(self.pm.read_bytes(self.addrInput, 1))
 
@@ -593,6 +1145,78 @@ class gameController:
 				result = self.getNetherLunatic()
 			elif difficulty == EXTRA:
 				result = self.getNetherExtra()
+		elif character == REIMU:
+			if difficulty == EASY:
+				result = self.getReimuEasy()
+			elif difficulty == NORMAL:
+				result = self.getReimuNormal()
+			elif difficulty == HARD:
+				result = self.getReimuHard()
+			elif difficulty == LUNATIC:
+				result = self.getReimuLunatic()
+		elif character == YUKARI:
+			if difficulty == EASY:
+				result = self.getYukariEasy()
+			elif difficulty == NORMAL:
+				result = self.getYukariNormal()
+			elif difficulty == HARD:
+				result = self.getYukariHard()
+			elif difficulty == LUNATIC:
+				result = self.getYukariLunatic()
+		elif character == MARISA:
+			if difficulty == EASY:
+				result = self.getMarisaEasy()
+			elif difficulty == NORMAL:
+				result = self.getMarisaNormal()
+			elif difficulty == HARD:
+				result = self.getMarisaHard()
+			elif difficulty == LUNATIC:
+				result = self.getMarisaLunatic()
+		elif character == ALICE:
+			if difficulty == EASY:
+				result = self.getAliceEasy()
+			elif difficulty == NORMAL:
+				result = self.getAliceNormal()
+			elif difficulty == HARD:
+				result = self.getAliceHard()
+			elif difficulty == LUNATIC:
+				result = self.getAliceLunatic()
+		elif character == SAKUYA:
+			if difficulty == EASY:
+				result = self.getSakuyaEasy()
+			elif difficulty == NORMAL:
+				result = self.getSakuyaNormal()
+			elif difficulty == HARD:
+				result = self.getSakuyaHard()
+			elif difficulty == LUNATIC:
+				result = self.getSakuyaLunatic()
+		elif character == REMILIA:
+			if difficulty == EASY:
+				result = self.getRemiliaEasy()
+			elif difficulty == NORMAL:
+				result = self.getRemiliaNormal()
+			elif difficulty == HARD:
+				result = self.getRemiliaHard()
+			elif difficulty == LUNATIC:
+				result = self.getRemiliaLunatic()
+		elif character == YOUMU:
+			if difficulty == EASY:
+				result = self.getYoumuEasy()
+			elif difficulty == NORMAL:
+				result = self.getYoumuNormal()
+			elif difficulty == HARD:
+				result = self.getYoumuHard()
+			elif difficulty == LUNATIC:
+				result = self.getYoumuLunatic()
+		elif character == YUYUKO:
+			if difficulty == EASY:
+				result = self.getYuyukoEasy()
+			elif difficulty == NORMAL:
+				result = self.getYuyukoNormal()
+			elif difficulty == HARD:
+				result = self.getYuyukoHard()
+			elif difficulty == LUNATIC:
+				result = self.getYuyukoLunatic()
 
 		return result
 
@@ -775,6 +1399,102 @@ class gameController:
 		self.pm.write_bytes(self.addrNetherSpellPractice[2], bytes([newNetherSpellPractice]), 1)
 		self.pm.write_bytes(self.addrNetherSpellPractice[3], bytes([newNetherSpellPractice]), 1)
 
+	def setReimuEasy(self, newReimuEasy):
+		self.pm.write_int(self.addrReimuEasy, newReimuEasy)
+
+	def setReimuNormal(self, newReimuNormal):
+		self.pm.write_int(self.addrReimuNormal, newReimuNormal)
+
+	def setReimuHard(self, newReimuHard):
+		self.pm.write_int(self.addrReimuHard, newReimuHard)
+
+	def setReimuLunatic(self, newReimuLunatic):
+		self.pm.write_int(self.addrReimuLunatic, newReimuLunatic)
+
+	def setYukariEasy(self, newYukariEasy):
+		self.pm.write_int(self.addrYukariEasy, newYukariEasy)
+
+	def setYukariNormal(self, newYukariNormal):
+		self.pm.write_int(self.addrYukariNormal, newYukariNormal)
+
+	def setYukariHard(self, newYukariHard):
+		self.pm.write_int(self.addrYukariHard, newYukariHard)
+
+	def setYukariLunatic(self, newYukariLunatic):
+		self.pm.write_int(self.addrYukariLunatic, newYukariLunatic)
+
+	def setMarisaEasy(self, newMarisaEasy):
+		self.pm.write_int(self.addrMarisaEasy, newMarisaEasy)
+
+	def setMarisaNormal(self, newMarisaNormal):
+		self.pm.write_int(self.addrMarisaNormal, newMarisaNormal)
+
+	def setMarisaHard(self, newMarisaHard):
+		self.pm.write_int(self.addrMarisaHard, newMarisaHard)
+
+	def setMarisaLunatic(self, newMarisaLunatic):
+		self.pm.write_int(self.addrMarisaLunatic, newMarisaLunatic)
+
+	def setAliceEasy(self, newAliceEasy):
+		self.pm.write_int(self.addrAliceEasy, newAliceEasy)
+
+	def setAliceNormal(self, newAliceNormal):
+		self.pm.write_int(self.addrAliceNormal, newAliceNormal)
+
+	def setAliceHard(self, newAliceHard):
+		self.pm.write_int(self.addrAliceHard, newAliceHard)
+
+	def setAliceLunatic(self, newAliceLunatic):
+		self.pm.write_int(self.addrAliceLunatic, newAliceLunatic)
+
+	def setSakuyaEasy(self, newSakuyaEasy):
+		self.pm.write_int(self.addrSakuyaEasy, newSakuyaEasy)
+
+	def setSakuyaNormal(self, newSakuyaNormal):
+		self.pm.write_int(self.addrSakuyaNormal, newSakuyaNormal)
+
+	def setSakuyaHard(self, newSakuyaHard):
+		self.pm.write_int(self.addrSakuyaHard, newSakuyaHard)
+
+	def setSakuyaLunatic(self, newSakuyaLunatic):
+		self.pm.write_int(self.addrSakuyaLunatic, newSakuyaLunatic)
+
+	def setRemiliaEasy(self, newRemiliaEasy):
+		self.pm.write_int(self.addrRemiliaEasy, newRemiliaEasy)
+
+	def setRemiliaNormal(self, newRemiliaNormal):
+		self.pm.write_int(self.addrRemiliaNormal, newRemiliaNormal)
+
+	def setRemiliaHard(self, newRemiliaHard):
+		self.pm.write_int(self.addrRemiliaHard, newRemiliaHard)
+
+	def setRemiliaLunatic(self, newRemiliaLunatic):
+		self.pm.write_int(self.addrRemiliaLunatic, newRemiliaLunatic)
+
+	def setYoumuEasy(self, newYoumuEasy):
+		self.pm.write_int(self.addrYoumuEasy, newYoumuEasy)
+
+	def setYoumuNormal(self, newYoumuNormal):
+		self.pm.write_int(self.addrYoumuNormal, newYoumuNormal)
+
+	def setYoumuHard(self, newYoumuHard):
+		self.pm.write_int(self.addrYoumuHard, newYoumuHard)
+
+	def setYoumuLunatic(self, newYoumuLunatic):
+		self.pm.write_int(self.addrYoumuLunatic, newYoumuLunatic)
+
+	def setYuyukoEasy(self, newYuyukoEasy):
+		self.pm.write_int(self.addrYuyukoEasy, newYuyukoEasy)
+
+	def setYuyukoNormal(self, newYuyukoNormal):
+		self.pm.write_int(self.addrYuyukoNormal, newYuyukoNormal)
+
+	def setYuyukoHard(self, newYuyukoHard):
+		self.pm.write_int(self.addrYuyukoHard, newYuyukoHard)
+
+	def setYuyukoLunatic(self, newYuyukoLunatic):
+		self.pm.write_int(self.addrYuyukoLunatic, newYuyukoLunatic)
+
 	def setFpsText(self, newFpsText):
 		# If we have less than 8 character, we pad space character
 		if len(newFpsText) < 8:
@@ -827,6 +1547,79 @@ class gameController:
 				self.setNetherLunatic(newValue)
 			elif difficulty == EXTRA:
 				self.setNetherExtra(newValue)
+		elif character == REIMU:
+			if difficulty == EASY:
+				self.setReimuEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setReimuNormal(newValue)
+			elif difficulty == HARD:
+				self.setReimuHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setReimuLunatic(newValue)
+		elif character == YUKARI:
+			if difficulty == EASY:
+				self.setYukariEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setYukariNormal(newValue)
+			elif difficulty == HARD:
+				self.setYukariHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setYukariLunatic(newValue)
+		elif character == MARISA:
+			if difficulty == EASY:
+				self.setMarisaEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setMarisaNormal(newValue)
+			elif difficulty == HARD:
+				self.setMarisaHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setMarisaLunatic(newValue)
+		elif character == ALICE:
+			if difficulty == EASY:
+				self.setAliceEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setAliceNormal(newValue)
+			elif difficulty == HARD:
+				self.setAliceHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setAliceLunatic(newValue)
+		elif character == SAKUYA:
+			if difficulty == EASY:
+				self.setSakuyaEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setSakuyaNormal(newValue)
+			elif difficulty == HARD:
+				self.setSakuyaHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setSakuyaLunatic(newValue)
+		elif character == REMILIA:
+			if difficulty == EASY:
+				self.setRemiliaEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setRemiliaNormal(newValue)
+			elif difficulty == HARD:
+				self.setRemiliaHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setRemiliaLunatic(newValue)
+		elif character == YOUMU:
+			if difficulty == EASY:
+				self.setYoumuEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setYoumuNormal(newValue)
+			elif difficulty == HARD:
+				self.setYoumuHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setYoumuLunatic(newValue)
+		elif character == YUYUKO:
+			if difficulty == EASY:
+				self.setYuyukoEasy(newValue)
+			elif difficulty == NORMAL:
+				self.setYuyukoNormal(newValue)
+			elif difficulty == HARD:
+				self.setYuyukoHard(newValue)
+			elif difficulty == LUNATIC:
+				self.setYuyukoLunatic(newValue)
+
 
 	def setCharacterSpellPractice(self, character, access):
 		value = 0x80 if access else 0x00
@@ -917,6 +1710,46 @@ class gameController:
 		self.pm.write_bytes(self.addrNetherHardClear, bytes([value]), 1)
 		self.pm.write_bytes(self.addrNetherLunaticClear, bytes([value]), 1)
 
+		self.pm.write_bytes(self.addrReimuEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrReimuNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrReimuHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrReimuLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrYukariEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYukariNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYukariHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYukariLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrMarisaEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrMarisaNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrMarisaHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrMarisaLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrAliceEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrAliceNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrAliceHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrAliceLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrSakuyaEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrSakuyaNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrSakuyaHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrSakuyaLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrRemiliaEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrRemiliaNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrRemiliaHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrRemiliaLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrYoumuEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYoumuNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYoumuHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYoumuLunaticClear, bytes([value]), 1)
+
+		self.pm.write_bytes(self.addrYuyukoEasyClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYuyukoNormalClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYuyukoHardClear, bytes([value]), 1)
+		self.pm.write_bytes(self.addrYuyukoLunaticClear, bytes([value]), 1)
+
 	def setKill(self, active):
 		if active:
 			self.pm.write_bytes(self.addrKillCondition, bytes([0x90, 0x90]), 2)
@@ -988,8 +1821,14 @@ class gameController:
 		else:
 			self.pm.write_bytes(self.addrTimeGainHack, bytes([0x90, 0x90, 0x90]), 3)
 
-	def forceLockSoloCharacter(self):
-		self.pm.write_bytes(self.addrForceLockSoloCharacter, bytes([0xEB]), 1)
+	def soloCharacterState(self, unlocked):
+		if unlocked:
+			self.pm.write_bytes(self.addrSoloCharacterConditions[0], bytes([0x90, 0x90]), 2)
+			self.pm.write_bytes(self.addrSoloCharacterConditions[1], bytes([0x90, 0x90]), 2)
+			self.pm.write_bytes(self.addrSoloCharacterConditions[2], bytes([0x90, 0x90]), 2)
+			self.pm.write_bytes(self.addrSoloCharacterConditions[3], bytes([0x90, 0x90]), 2)
+		else:
+			self.pm.write_bytes(self.addrSoloCharacterConditions[0], bytes([0xEB, 0x33]), 2)
 
 	def initAntiTemperHack(self):
 		self.pm.write_bytes(self.addrAntiTemperHack, bytes([0x33, 0xC0, 0xC3]), 3)
@@ -1006,7 +1845,7 @@ class gameController:
 	def showSplashScreens(self):
 		addr = self.pm.base_address+ADDR_STRUCT
 		value = int.from_bytes(self.pm.read_bytes(addr, 4))
-		flags = 0b1000000000000001
+		flags = 0b1000000000000011
 		new_value = value|flags
 		if value != new_value:
 			self.pm.write_bytes(addr, new_value.to_bytes(4), 4)

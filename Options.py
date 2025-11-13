@@ -38,6 +38,28 @@ class ExcludeLunatic(Toggle):
 	"""[Practice/Normal] If the Lunatic difficulty is excluded"""
 	display_name = "Exclude Lunatic difficulty"
 
+class Characters(Choice):
+	"""
+	Which characters are included.
+    All solo characters will be unlocked by default. If both solo and teams are included, no team will be unlocked at the start.
+	"""
+	display_name = "Characters included"
+	option_teams_only = 0
+	option_solo_only = 1
+	option_all_characters = 2
+	default = 0
+
+class SpellCardTeams(Range):
+	"""
+	[Spell Practice] How many teams will have spell practice check. (Determine the number of time you have to do a spell card)
+    The starting team will always be one of the teams who have access to spell practice.
+    Solo character will always have spell cards if they are enabled.
+	"""
+	display_name = "Spell Cards Teams"
+	range_start = 2
+	range_end = 4
+	default = 4
+
 class NumberLifeMid(Range):
 	"""[Practice/Normal] Number of life the randomizer expect you to have before facing Keine, Reimu and Marisa"""
 	display_name = "Number of life expected in order to face Keine, Reimu and Marisa"
@@ -119,7 +141,12 @@ class DifficultyCheck(Choice):
 	display_name = "Difficulty Check"
 	option_false = 0
 	option_true = 1
-	option_true_with_lower = 2
+
+class CheckMultipleDifficulty(Toggle):
+	"""
+	[Practice/Normal] For difficulty check, choose if the check of the highest difficulty include the check of the lower difficulties that are unlocked. Can be changed later.
+	"""
+	display_name = "Multiple Difficulty Check"
 
 class TimeCheck(Toggle):
 	"""
@@ -203,6 +230,7 @@ class Goal(Choice):
     [Practice/Normal] Eirin/Kaguya/Mokou: You must beat the selected boss
     [Practice/Normal] All Bosses: You must beat all the bosses (Mokou only when the Extra Stage is active)
     [Spell Practice] Kaguya's Treasures: You must collect the 5 treasures.
+    [Spell Practice] Capture Spell Cards: You must capture a set number of unique Spell Cards. (Accessibility full is forced)
 	"""
 	display_name = "Goal"
 	option_eirin = 0
@@ -210,6 +238,7 @@ class Goal(Choice):
 	option_mokou = 2
 	option_all_bosses = 3
 	option_kaguya_treasures = 4
+	option_capture_spell_cards = 5
 	default = 1
 
 class EndingRequired(Choice):
@@ -239,7 +268,7 @@ class TreasureLocation(Choice):
 
 class TreasureFinalSpellCard(Range):
 	"""
-	[Spell Practice] Which Spell Card is set has the victory condition and is unlocked with the 5 treasure
+	[Spell Practice] If the goal is Kaguya's Treasures, which Spell Card is set has the victory condition and is unlocked with the 5 treasure
 	The value is the ID of the Spell Card.
 	If the Spell Card is excluded, it will do -1 to the spell card until it found a valid one.
 	Default to the last Spell Card of Kaguya.
@@ -261,12 +290,45 @@ class TreasureFinalSpellCard(Range):
 	range_end = 222
 	default = 191
 
+class CaptureSpellCardsStage(OptionSet):
+	"""
+	[Spell Practice] If the goal is set to Capture Spell Cards, choose from which stages the Spell Cards count for the goal.
+    If empty, all stages will be included.
+    If filters exclude all spell card of the selected stages, all stages will be included.
+
+    Valid Values: ["Stage 1", "Stage 2", "Stage 3", "Stage 4A", "Stage 4B", "Stage 5", "Stage 6A", "Stage 6B", "Extra", "Last Word"]
+	"""
+	display_name = "Stages for Capture Spell Cards"
+	valid_keys = ["Stage 1", "Stage 2", "Stage 3", "Stage 4A", "Stage 4B", "Stage 5", "Stage 6A", "Stage 6B", "Extra", "Last Word"]
+	default = ["Stage 1", "Stage 2", "Stage 3", "Stage 4A", "Stage 4B", "Stage 5", "Stage 6A", "Stage 6B", "Extra", "Last Word"]
+
+class CaptureSpellCardsCount(Range):
+	"""
+	[Spell Practice] If the goal is set to Capture Spell Cards, choose how many unique Spell Cards you need to capture to win.
+    If the number is higher than the available Spell Cards based on the filters, it will be reduced to the maximum possible.
+	"""
+	display_name = "Number of unique Spell Cards to capture"
+	range_start = 5
+	range_end = 222
+	default = 50
+
 class DeathLink(Toggle):
 	"""
 	When you die, everyone who enabled death link dies. Of course, the reverse is true too. Can be changed later.
     In Spell Practice, you can only receive Death Links.
 	"""
 	display_name = "Death Link"
+
+class DeathLinkTrigger(Choice):
+	"""
+	When does a death link is triggerd. Can be changed later.
+    Life: Send a death link when losing a life
+    Game Over: Send a death link when getting a game over
+	"""
+	display_name = "Death Link Trigger"
+	option_life = 0
+	option_game_over = 1
+	default = 0
 
 class DeathLinkAmnesty(Range):
 	"""
@@ -400,6 +462,8 @@ class Th08Options(PerGameCommonOptions):
 	stage_unlock: StageUnlock
 	progressive_stage: ProgressiveStage
 	exclude_lunatic: ExcludeLunatic
+	characters: Characters
+	spell_cards_teams : SpellCardTeams
 	number_life_mid: NumberLifeMid
 	number_bomb_mid: NumberBombsMid
 	difficulty_mid: DifficultyMid
@@ -410,6 +474,7 @@ class Th08Options(PerGameCommonOptions):
 	number_life_extra: NumberLifeExtra
 	number_bomb_extra: NumberBombsExtra
 	difficulty_check: DifficultyCheck
+	check_multiple_difficulty: CheckMultipleDifficulty
 	time_check: TimeCheck
 	time: Time
 	both_stage_4: BothStage4
@@ -422,7 +487,10 @@ class Th08Options(PerGameCommonOptions):
 	ending_required: EndingRequired
 	treasure_location: TreasureLocation
 	treasure_final_spell_card: TreasureFinalSpellCard
+	capture_spell_cards_stage: CaptureSpellCardsStage
+	capture_spell_cards_count: CaptureSpellCardsCount
 	death_link: DeathLink
+	death_link_trigger: DeathLinkTrigger
 	death_link_amnesty: DeathLinkAmnesty
 	ring_link: RingLink
 	limit_lives: LimitLives

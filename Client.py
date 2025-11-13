@@ -19,13 +19,38 @@ from CommonClient import (
 )
 
 class TouhouClientProcessor(ClientCommandProcessor):
+	def _cmd_multiple_difficulty_check(self, active = None):
+		"""Toggle the possibility to check multiple difficulty check by doing the highest difficulty
+        :param active: If "on" or "true", enable it. If "off" or "false", disable it."""
+		changed = False
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if active is not None:
+				if active.lower() in ["on", "true"]:
+					if "DeathLink" not in self.ctx.tags:
+						self.ctx.check_multiple_difficulty = True
+						changed = True
+					logger.info("Multiple difficulty check enabled")
+				elif active.lower() in ("off", "false"):
+					if "DeathLink" in self.ctx.tags:
+						self.ctx.check_multiple_difficulty = False
+						changed = True
+					logger.info("Multiple difficulty check disabled")
+				else:
+					logger.error("Invalid argument, use 'on' or 'off'")
+			else:
+				logger.info(f"Multiple difficulty check is {'enabled' if self.ctx.death_link_is_active else 'disabled'}")
+		else:
+			logger.error("Multiple difficulty check cannot be changed before connecting to the game and server")
+
+		return changed
+
 	def _cmd_deathlink(self, active = None):
 		"""Toggle DeathLink on or off
         :param active: If "on" or "true", enable DeathLink. If "off" or "false", disable DeathLink."""
 		changed = False
 		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
 			if active is not None:
-				if active.lower() in ("on", "true"):
+				if active.lower() in ["on", "true"]:
 					if "DeathLink" not in self.ctx.tags:
 						self.ctx.tags.add("DeathLink")
 						self.ctx.death_link_is_active = True
@@ -48,6 +73,31 @@ class TouhouClientProcessor(ClientCommandProcessor):
 			logger.error("DeathLink cannot be changed before connecting to the game and server")
 
 		return changed
+
+	def _cmd_deathlink_trigger(self, value = None):
+		"""Get or Set the trigger for the DeayhLink trigger
+        :param value: Possibler values are "life" or "gameover"
+		"""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if value is not None:
+				if value.lower() == "life":
+					self.ctx.death_link_trigger = DEATH_LINK_LIFE
+					logger.info("DeathLink trigger set to 'Life'")
+					return True
+				elif value.lower() == "gameover":
+					self.ctx.death_link_trigger = DEATH_LINK_GAME_OVER
+					logger.info("DeathLink trigger set to 'Game Over'")
+					return True
+				else:
+					logger.error("Invalid argument, use 'life' or 'gameover'")
+					return False
+			else:
+				trigger = "Life" if self.ctx.death_link_trigger == DEATH_LINK_LIFE else "Game Over"
+				logger.info(f"Current DeathLink Trigger: {trigger}")
+				return True
+		else:
+			logger.error("DeathLink amnesty cannot be accessed before connecting to the game and server")
+			return False
 
 	def _cmd_deathlink_amnesty(self, value = -1):
 		"""Get or Set the number of death before sending a DeathLink
@@ -134,9 +184,23 @@ class TouhouClientProcessor(ClientCommandProcessor):
 				return False
 			logger.info(f"Treasures collected: {self.ctx.handler.treasures}/5")
 			logger.info(f"Final Spell Card: {self.ctx.handler.final_spell_card}")
+			if self.options['nb_treasure_not_placed'] > 0:
+				logger.info(f"Note: {self.options['nb_treasure_not_placed']} treasure(s) were placed 'anywhere'.")
 			return True
 		else:
 			logger.error("Treasures cannot be accessed before connecting to the game and server")
+			return False
+
+	def _cmd_captures(self):
+		"""Get the number of Spell Cards captured."""
+		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
+			if self.ctx.options["goal"] != CAPTURE_GOAL:
+				logger.error("No Capture.")
+				return False
+			logger.info(f"Spell Cards captured: {len(self.ctx.capture_spell_cards_list)}/{self.ctx.options['capture_spell_cards_count']}")
+			return True
+		else:
+			logger.error("Captures cannot be accessed before connecting to the game and server")
 			return False
 
 class TouhouContext(CommonContext):
@@ -172,6 +236,11 @@ class TouhouContext(CommonContext):
 		self.death_link_is_active = False
 		self.ring_link_is_active = False
 		self.death_link_amnesty = 0
+		self.death_link_trigger = DEATH_LINK_LIFE
+
+		# Spell Card
+		self.capture_spell_cards_list = []
+		self.victory_sent = False
 
 		# Counter
 		self.difficulties = 3
@@ -179,7 +248,7 @@ class TouhouContext(CommonContext):
 		self.can_trap = True
 
 		self.options = None
-		self.otherDifficulties = False
+		self.check_multiple_difficulty = False
 		self.ExtraMenu = False
 		self.minimalCursor = 0
 
@@ -203,8 +272,8 @@ class TouhouContext(CommonContext):
 			self.all_location_ids = set(args["missing_locations"] + args["checked_locations"])
 			self.options = args["slot_data"] # Yaml Options
 			self.is_connected = True
-			self.otherDifficulties = self.options['difficulty_check'] == DIFFICULTY_WITH_LOWER
-			self.location_mapping, self.stage_specific_location_id = getLocationMapping(self.options['difficulty_check'] in DIFFICULTY_CHECK)
+			self.check_multiple_difficulty = self.options['check_multiple_difficulty']
+			self.location_mapping, self.stage_specific_location_id = getLocationMapping(self.options['difficulty_check'] == DIFFICULTY_CHECK)
 
 			if self.handler is not None:
 				self.handler.reset()
@@ -377,6 +446,10 @@ class TouhouContext(CommonContext):
 						self.handler.unlockExtraStage(NETHER_TEAM)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2109: # [Solo] Extra Stage
+					self.handler.unlockSoloExtraStage()
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 210: # Stage 2
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(1, -1, bothStage4)
@@ -552,22 +625,353 @@ class TouhouContext(CommonContext):
 					self.handler.addStage(7, NETHER_TEAM, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 300 | 301 | 302 | 303: # Ending - Eirin
-					character = ILLUSION_TEAM if item_id == 300 else (MAGIC_TEAM if item_id == 301 else (DEVIL_TEAM if item_id == 302 else NETHER_TEAM))
+				case 245: # [Reimu] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 246: # [Yukari] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 247: # [Marisa] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 248: # [Alice] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 249: # [Sakuya] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 250: # [Remilia] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 251: # [Youmu] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 252: # [Yuyuko] Next Stage
+					isExtraStageLinear = self.options['extra_stage'] == EXTRA_LINEAR
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addProgressiveStage(isExtraStageLinear, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 253: # [Reimu] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 254: # [Reimu] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 255: # [Reimu] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 256: # [Reimu] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 257: # [Reimu] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 258: # [Reimu] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 259: # [Reimu] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, REIMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 260: # [Yukari] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 261: # [Yukari] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 262: # [Yukari] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 263: # [Yukari] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 264: # [Yukari] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 265: # [Yukari] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 266: # [Yukari] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, YUKARI, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 267: # [Marisa] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 268: # [Marisa] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 269: # [Marisa] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 270: # [Marisa] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 271: # [Marisa] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 272: # [Marisa] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 273: # [Marisa] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, MARISA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 274: # [Alice] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 275: # [Alice] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 276: # [Alice] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 278: # [Alice] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 279: # [Alice] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 280: # [Alice] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 281: # [Alice] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, ALICE, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 282: # [Sakuya] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 283: # [Sakuya] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 284: # [Sakuya] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 285: # [Sakuya] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 286: # [Sakuya] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 287: # [Sakuya] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 288: # [Sakuya] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, SAKUYA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 289: # [Remilia] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 290: # [Remilia] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 291: # [Remilia] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 292: # [Remilia] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 293: # [Remilia] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 294: # [Remilia] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 295: # [Remilia] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, REMILIA, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 296: # [Youmu] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 297: # [Youmu] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 298: # [Youmu] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 299: # [Youmu] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2100: # [Youmu] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2101: # [Youmu] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2102: # [Youmu] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, YOUMU, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2103: # [Yuyuko] Stage 2
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(1, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2104: # [Yuyuko] Stage 3
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(2, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2105: # [Yuyuko] Stage 4A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(3, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2106: # [Yuyuko] Stage 4B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(4, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2107: # [Yuyuko] Stage 5
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(5, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2108: # [Yuyuko] Stage 6A
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(6, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 2109: # [Yuyuko] Stage 6B
+					bothStage4 = self.options['both_stage_4']
+					self.handler.addStage(7, YUYUKO, bothStage4)
+					gotAnyItem = True
+					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+				case 300 | 301 | 302 | 303 | 318 | 319 | 320 | 321 | 322 | 323 | 324 | 325: # Ending - Eirin
+					values = {300: ILLUSION_TEAM, 301: MAGIC_TEAM, 302: DEVIL_TEAM, 303: NETHER_TEAM, 318: REIMU, 319: YUKARI, 320: MARISA, 321: ALICE, 322: SAKUYA, 323: REMILIA, 324: YOUMU, 325: YUYUKO}
+					character = values[item_id]
 					self.handler.addEnding(character, ENDING_FINAL_A)
 					if self.checkVictory():
 						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 304 | 305 | 306 | 307: # Ending - Kaguya
-					character = ILLUSION_TEAM if item_id == 304 else (MAGIC_TEAM if item_id == 305 else (DEVIL_TEAM if item_id == 306 else NETHER_TEAM))
+				case 304 | 305 | 306 | 307 | 326 | 327 | 328 | 329 | 330 | 331 | 332 | 333: # Ending - Kaguya
+					values = {304: ILLUSION_TEAM, 305: MAGIC_TEAM, 306: DEVIL_TEAM, 307: NETHER_TEAM, 326: REIMU, 327: YUKARI, 328: MARISA, 329: ALICE, 330: SAKUYA, 331: REMILIA, 332: YOUMU, 333: YUYUKO}
+					character = values[item_id]
 					self.handler.addEnding(character, ENDING_FINAL_B)
 					if self.checkVictory():
 						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 308 | 309 | 310 | 311: # Ending - Mokou
-					character = ILLUSION_TEAM if item_id == 308 else (MAGIC_TEAM if item_id == 309 else (DEVIL_TEAM if item_id == 310 else NETHER_TEAM))
+				case 308 | 309 | 310 | 311 | 334 | 335 | 336 | 337 | 338 | 339 | 340 | 341: # Ending - Mokou
+					values = {308: ILLUSION_TEAM, 309: MAGIC_TEAM, 310: DEVIL_TEAM, 311: NETHER_TEAM, 334: REIMU, 335: YUKARI, 336: MARISA, 337: ALICE, 338: SAKUYA, 339: REMILIA, 340: YOUMU, 341: YUYUKO}
+					character = values[item_id]
 					self.handler.addEnding(character, ENDING_EXTRA)
 					if self.checkVictory():
 						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
@@ -578,7 +982,8 @@ class TouhouContext(CommonContext):
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 317: # Impossible Request Completed
-					await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
+					if self.options['goal'] == TREASURE_GOAL:
+						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 400: # 1 Power Point
@@ -752,6 +1157,12 @@ class TouhouContext(CommonContext):
 
 		return normal_a_victory and normal_b_victory and extra_victory
 
+	def checkSpellCardVictory(self):
+		if self.options['goal'] != CAPTURE_GOAL:
+			return False
+
+		return len(self.capture_spell_cards_list) >= self.options['capture_spell_cards_count']
+
 	async def main_loop(self):
 		"""
 		Main loop that handles giving resources and updating locations.
@@ -825,7 +1236,7 @@ class TouhouContext(CommonContext):
 							# If the boss is defeated, we update the locations
 							if(not self.handler.isBossPresent()):
 								if(not self.handler.isCurrentBossDefeated(bossCounter)):
-									self.handler.setCurrentStageBossBeaten(bossCounter, self.otherDifficulties)
+									self.handler.setCurrentStageBossBeaten(bossCounter, self.check_multiple_difficulty)
 									#If the stage is ending, we disable traps and reset the counter
 									if bossCounter == nbBoss-1:
 										self.can_trap = False
@@ -875,6 +1286,7 @@ class TouhouContext(CommonContext):
 			mode = self.options['mode']
 			exclude_lunatic = self.options['exclude_lunatic']
 			time = self.options['time']
+			solo_characters = self.options['characters'] in [SOLO_ONLY, ALL_CHARACTER]
 
 			if exclude_lunatic:
 				self.difficulties -= 1
@@ -882,6 +1294,9 @@ class TouhouContext(CommonContext):
 
 			if not time:
 				self.handler.unlockTimeGain()
+
+			if solo_characters:
+				self.handler.unlockSoloCharacter()
 
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(0.1)
@@ -907,20 +1322,26 @@ class TouhouContext(CommonContext):
 					elif (menu in NORMAL_MENU or menu in PRACTICE_MENU) or self.handler.getDifficulty() < EXTRA:
 						self.ExtraMenu = False
 
+					# If solo characters have acces to the Extra Stage
+					solo_extra_access = solo_characters and menu == MAIN_MENU and self.handler.canSoloExtra()
+
 					# If we're in the difficulty menu, we put the minimal value to the lowest difficulty
 					if menu in [NORMAL_DIFFICULTY_MENU, PRACTICE_DIFFICULTY_MENU]:
 						self.minimalCursor = -1
 					# If we're in the main menu and we play in practice mode, we lock the access to normal mode
 					elif menu == MAIN_MENU and mode not in NORMAL_MODE:
 						# 1 If we have access to the extra stage, 2 if we don't
-						self.minimalCursor = 1 if self.handler.canExtra() else (2 if mode in SPELL_PRACTICE_MODE else 3)
+						self.minimalCursor = 1 if self.handler.canExtra() or solo_extra_access else (2 if mode in SPELL_PRACTICE_MODE else 3)
 					else:
 						self.minimalCursor = 0
 
 					try:
 						self.updateStageList()
-						self.handler.updateExtraUnlock(not self.ExtraMenu)
+						self.handler.updateExtraUnlock(not self.ExtraMenu, solo_extra_access, (menu == MAIN_MENU))
 						self.handler.updateCursor(self.minimalCursor)
+
+						if self.options['characters'] in [SOLO_ONLY, ALL_CHARACTER]:
+							self.handler.forceSpellPracticeAccess(menu == MAIN_MENU)
 					except Exception as e:
 						pass
 		except Exception as e:
@@ -935,7 +1356,6 @@ class TouhouContext(CommonContext):
 
 		try:
 			PowerPointDrain = False
-			NoFocus = False
 			ReverseControls = False
 			AyaSpeed = False
 			Freeze = False
@@ -1038,15 +1458,11 @@ class TouhouContext(CommonContext):
 								counterFreeze = 0
 								self.handler.resetSpeed()
 				else:
-					# if NoFocus:
-					# 	self.handler.canFocus(True)
-
 					if reversedHYGauge:
 						self.handler.setHumanYoukaiGauge(True)
 
 					InLevel = False
 					PowerPointDrain = False
-					NoFocus = False
 					ReverseControls = False
 					AyaSpeed = False
 					Freeze = False
@@ -1110,12 +1526,13 @@ class TouhouContext(CommonContext):
 							onGoingDeathLink = False
 							self.pending_death_link = False
 						else:
-							nb_death += 1
-							if nb_death >= self.death_link_amnesty:
-								await self.send_death_link()
-								nb_death = 0
-							else:
-								logger.info(f"DeathLink: {nb_death}/{self.death_link_amnesty}")
+							if self.death_link_trigger == DEATH_LINK_LIFE or (self.death_link_trigger == DEATH_LINK_GAME_OVER and self.handler.getCurrentLives() == 0):
+								nb_death += 1
+								if nb_death >= self.death_link_amnesty:
+									await self.send_death_link()
+									nb_death = 0
+								else:
+									logger.info(f"DeathLink: {nb_death}/{self.death_link_amnesty}")
 
 						currentMisses += 1
 					# If no death has occured but a death link is pending, we try to kill the player
@@ -1202,23 +1619,24 @@ class TouhouContext(CommonContext):
 		guard_rail = GuardRail(self.handler.gameController, self.handler, self.options)
 		while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 			try:
-				await asyncio.sleep(2)
+				await asyncio.sleep(5)
 				result = guard_rail.check_memory_addresses()
 				if result["error"]:
 					logger.error(f"Memory ERROR: {result['message']}")
 
-				result = guard_rail.check_cursor_state()
-				if result["error"]:
-					logger.error(f"Cursor State ERROR: {result['message']}")
+				if self.handler.getGameMode() != IN_GAME:
+					result = guard_rail.check_cursor_state()
+					if result["error"]:
+						logger.error(f"Cursor State ERROR: {result['message']}")
 
-				result = guard_rail.check_menu_lock()
-				if result["error"]:
-					logger.error(f"Menu Lock ERROR: {result['message']}")
+					result = guard_rail.check_menu_lock()
+					if result["error"]:
+						logger.error(f"Menu Lock ERROR: {result['message']}")
 
-				# if mode in SPELL_PRACTICE_MODE:
-				# 	result = guard_rail.check_spell_cards()
-				# 	if result["error"]:
-				# 		logger.error(f"Spell Card ERROR: {result['message']}")
+					if mode in SPELL_PRACTICE_MODE:
+						result = guard_rail.check_spell_cards()
+						if result["error"]:
+							logger.error(f"Spell Card ERROR: {result['message']}")
 			except Exception as e:
 				logger.error(f"GuardRail ERROR: {e}")
 				logger.error(traceback.format_exc())
@@ -1235,6 +1653,8 @@ class TouhouContext(CommonContext):
 			if self.options['treasure_final_spell_card']:
 				self.handler.setFinalSpellCard(self.options['treasure_final_spell_card'])
 
+			self.handler.setSpellCardsTeams(self.options['spell_cards_teams'])
+
 			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
 				await asyncio.sleep(1)
 				spell_card_acquired = self.handler.getSpellCardAcquired()
@@ -1248,8 +1668,18 @@ class TouhouContext(CommonContext):
 								item_id = STARTING_ID + int("6"+str(character)+id)
 								new_spell_cards.append(item_id)
 
+								# If we're in capture goal, we add the spell card to the list if it's not already present and it's valid spell card
+								if self.options['goal'] == CAPTURE_GOAL and id not in self.capture_spell_cards_list:
+									if id in self.options['capture_spell_cards_list']:
+										self.capture_spell_cards_list.append(id)
+
 				if new_spell_cards:
 					await self.send_msgs([{"cmd": 'LocationChecks', "locations": new_spell_cards}])
+
+				if self.options['goal'] == CAPTURE_GOAL and self.checkSpellCardVictory() and not self.victory_sent:
+					await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
+					self.victory_sent = True
+
 		except Exception as e:
 			logger.error(f"SpellCard ERROR: {e}")
 			logger.error(traceback.format_exc())
@@ -1335,6 +1765,9 @@ async def game_watcher(ctx: TouhouContext):
 
 			if ctx.options['death_link_amnesty']:
 				ctx.death_link_amnesty = ctx.options['death_link_amnesty']
+
+			if ctx.options['death_link_trigger']:
+				ctx.death_link_trigger = ctx.options['death_link_trigger']
 
 			if ctx.options['ring_link']:
 				ctx.setRingLinkTag(True)

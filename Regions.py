@@ -3,15 +3,15 @@ from .Locations import TLocation, location_table
 from .Variables import *
 from .SpellCards import SPELL_CARDS_LIST
 
-def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check, mode, spell_cards):
+def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check, mode, spell_cards, characters, spell_cards_teams):
 	regions = {}
-	characters = CHARACTERS_LIST
+	characters = CHARACTERS_LIST if characters == TEAM_ONLY else (ALL_CHARACTERS_LIST if characters == ALL_CHARACTER else SOLO_CHARACTERS_LIST)
 	regions["Menu"] = {"locations": None, "exits": characters}
 	for character in characters:
 		regions[character] = {"locations": None, "exits": []}
 
 	if mode in PRACTICE_MODE or mode in NORMAL_MODE:
-		if difficulty_check not in DIFFICULTY_CHECK:
+		if difficulty_check == NO_DIFFICULTY_CHECK:
 			for character in characters:
 				regions[character] = {"locations": None, "exits": [f"[{character}] Early", f"[{character}] Mid", f"[{character}] Late"]}
 				regions[f"[{character}] Early"] = {"locations": None, "exits": [f"[{character}] Stage 1", f"[{character}] Stage 2"]}
@@ -163,32 +163,34 @@ def get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_che
 
 	if mode in SPELL_PRACTICE_MODE:
 		for character in characters:
-			regions[character]["exits"].append(f"[{character}] SpellCard")
-			regions[f"[{character}] SpellCard"] = {"locations": [], "exits": [f"[{character}][SC] Stage 1", f"[{character}][SC] Stage 2", f"[{character}][SC] Stage 3", f"[{character}][SC] Stage 4A", f"[{character}][SC] Stage 4B", f"[{character}][SC] Stage 5", f"[{character}][SC] Stage 6A", f"[{character}][SC] Stage 6B", f"[{character}][SC] Extra", f"[{character}][SC] Last Word"]}
+			if character in SOLO_CHARACTERS_LIST or character in spell_cards_teams:
+				regions[character]["exits"].append(f"[{character}] SpellCard")
+				regions[f"[{character}] SpellCard"] = {"locations": [], "exits": [f"[{character}][SC] Stage 1", f"[{character}][SC] Stage 2", f"[{character}][SC] Stage 3", f"[{character}][SC] Stage 4A", f"[{character}][SC] Stage 4B", f"[{character}][SC] Stage 5", f"[{character}][SC] Stage 6A", f"[{character}][SC] Stage 6B", f"[{character}][SC] Extra", f"[{character}][SC] Last Word"]}
 
-			# Init Stages region
-			for stage in regions[f"[{character}] SpellCard"]["exits"]:
-				regions[stage] = {"locations": [], "exits": None}
+				# Init Stages region
+				for stage in regions[f"[{character}] SpellCard"]["exits"]:
+					regions[stage] = {"locations": [], "exits": None}
 
-			# Filling locations
-			for id in spell_cards:
-				regions[f"[{character}][SC] "+SPELL_CARDS_LIST[id]["stage"]]["locations"].append(f"[{character}] {id} - {SPELL_CARDS_LIST[id]['name']}")
+				# Filling locations
+				for id in spell_cards:
+					regions[f"[{character}][SC] "+SPELL_CARDS_LIST[id]["stage"]]["locations"].append(f"[{character}] {id} - {SPELL_CARDS_LIST[id]['name']}")
 
 	return regions
 
-def create_regions(multiworld: MultiWorld, player: int, options, spell_cards: list):
+def create_regions(multiworld: MultiWorld, player: int, options, spell_cards: list, spell_cards_teams: list):
 	difficulty_check = getattr(options, "difficulty_check")
 	extra = getattr(options, "extra_stage")
 	exclude_lunatic = getattr(options, "exclude_lunatic")
 	both_stage_4 = getattr(options, "both_stage_4")
 	mode = getattr(options, "mode")
 	time_check = getattr(options, "time_check")
+	characters = getattr(options, "characters")
 
 	# If we're in Normal mode, we force both_stage_4 to be False
 	if mode in NORMAL_MODE:
 		both_stage_4 = False
 
-	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check, mode, spell_cards)
+	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check, mode, spell_cards, characters, spell_cards_teams)
 
 	# Set up the regions correctly.
 	for name, data in regions.items():

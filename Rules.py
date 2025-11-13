@@ -10,7 +10,10 @@ def constructProgressiveStageRule(player, state, nb_stage, mode, difficulty, cha
 	if mode not in NORMAL_MODE:
 		if character_list:
 			for character in character_list:
-				stage_rule = stage_rule or (state.count(f"[{character}] Next Stage", player) >= nb_stage and state.has_any(CHARACTER_TO_ITEM[character], player))
+				if character in CHARACTERS_LIST:
+					stage_rule = stage_rule or (state.count(f"[{character}] Next Stage", player) >= nb_stage and state.has_any(CHARACTER_TO_ITEM[character], player))
+				else:
+					stage_rule = stage_rule or state.count(f"[{character}] Next Stage", player) >= nb_stage
 		else:
 			stage_rule = state.count("Next Stage", player) >= nb_stage
 	else:
@@ -24,10 +27,16 @@ def constructStageRule(player, state, stage, mode, difficulty, character_list):
 	if mode not in NORMAL_MODE:
 		if character_list:
 			for character in character_list:
-				if stage != "Stage 1":
-					stage_rule = stage_rule or (state.has(f"[{character}] {stage}", player) and state.has_any(CHARACTER_TO_ITEM[character], player))
+				if character in CHARACTERS_LIST:
+					if stage != "Stage 1":
+						stage_rule = stage_rule or (state.has(f"[{character}] {stage}", player) and state.has_any(CHARACTER_TO_ITEM[character], player))
+					else:
+						stage_rule = stage_rule or (state.has_any(CHARACTER_TO_ITEM[character], player))
 				else:
-					stage_rule = stage_rule or (state.has_any(CHARACTER_TO_ITEM[character], player))
+					if stage != "Stage 1":
+						stage_rule = stage_rule or state.has(f"[{character}] {stage}", player)
+					else:
+						stage_rule = True
 		else:
 			if stage != "Stage 1":
 				stage_rule = state.has(f"{stage}", player)
@@ -53,7 +62,10 @@ def constructExtraRule(player, state, character_list, mode, extra):
 		if mode not in NORMAL_MODE:
 			if character_list:
 				for character in character_list:
-					stage_rule = stage_rule or (state.count(f"[{character}] Next Stage", player) >= 6 and state.has_any(CHARACTER_TO_ITEM[character], player))
+					if character in CHARACTERS_LIST:
+						stage_rule = stage_rule or (state.count(f"[{character}] Next Stage", player) >= 6 and state.has_any(CHARACTER_TO_ITEM[character], player))
+					else:
+						stage_rule = stage_rule or state.has(f"[Solo] Extra Stage", player)
 			else:
 				stage_rule = state.count("Next Stage", player) >= 6
 		else:
@@ -61,7 +73,10 @@ def constructExtraRule(player, state, character_list, mode, extra):
 	else:
 		if character_list:
 			for character in character_list:
-				stage_rule = stage_rule or (state.has(f"[{character}] Extra Stage", player) and state.has_any(CHARACTER_TO_ITEM[character], player))
+				if character in CHARACTERS_LIST:
+					stage_rule = stage_rule or (state.has(f"[{character}] Extra Stage", player) and state.has_any(CHARACTER_TO_ITEM[character], player))
+				else:
+					stage_rule = stage_rule or state.has(f"[Solo] Extra Stage", player)
 		else:
 			stage_rule = state.has("Extra Stage", player)
 
@@ -87,15 +102,16 @@ def makeFinalSpellCardRule(player, location):
 def addDifficultyRule(player, difficulty, rule):
 	return lambda state: state.count("Lower Difficulty", player) >= difficulty and rule(state)
 
-def victoryCondition(player, state, normal_a, normal_b, extra, treasure, type):
+def victoryCondition(player, state, normal_a, normal_b, extra, treasure, capture, characters, capture_list, capture_count, type):
 	normal_a_victory = True
 	normal_b_victory = True
 	extra_victory = True
 	treasure_victory = True
+	capture_victory = True
 
 	if normal_a:
 		endings = []
-		for character in CHARACTERS_LIST:
+		for character in characters:
 			endings.append(f"[{character}] {ENDING_FINAL_A_ITEM}")
 
 		if type == ONE_ENDING:
@@ -105,7 +121,7 @@ def victoryCondition(player, state, normal_a, normal_b, extra, treasure, type):
 
 	if normal_b:
 		endings = []
-		for character in CHARACTERS_LIST:
+		for character in characters:
 			endings.append(f"[{character}] {ENDING_FINAL_B_ITEM}")
 
 		if type == ONE_ENDING:
@@ -115,7 +131,7 @@ def victoryCondition(player, state, normal_a, normal_b, extra, treasure, type):
 
 	if extra:
 		endings = []
-		for character in CHARACTERS_LIST:
+		for character in characters:
 			endings.append(f"[{character}] {ENDING_EXTRA_ITEM}")
 
 		if type == ONE_ENDING:
@@ -126,7 +142,15 @@ def victoryCondition(player, state, normal_a, normal_b, extra, treasure, type):
 	if treasure:
 		treasure_victory = state.has(ENDING_TREASURE, player)
 
-	return normal_a_victory and normal_b_victory and extra_victory and treasure_victory
+	if capture:
+		captured_count = 0
+		for spell_name in capture_list:
+			if state.has(spell_name, player):
+				captured_count += 1
+
+		capture_victory = captured_count >= capture_count
+
+	return normal_a_victory and normal_b_victory and extra_victory and treasure_victory and capture_victory
 
 def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: list, rule=None):
 	lifeMid = getattr(multiworld.worlds[player].options, "number_life_mid")
@@ -182,7 +206,7 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 					level = exit.split("] ")[1]
 
 				difficulty_value = 0
-				if difficulty_check in DIFFICULTY_CHECK:
+				if difficulty_check == DIFFICULTY_CHECK:
 					lower_difficulty = 4
 					for difficulty in DIFFICULTY_LIST:
 						lower_difficulty -= 1
@@ -197,7 +221,7 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 				character_value = []
 				if stage_unlock != STAGE_GLOBAL:
 					if stage_unlock == STAGE_BY_CHARACTER:
-						for character in CHARACTERS_LIST:
+						for character in ALL_CHARACTERS_LIST:
 							if character in source:
 								character_value = [character]
 								break
@@ -208,7 +232,7 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 				character_value = []
 				if stage_unlock != STAGE_GLOBAL:
 					if stage_unlock == STAGE_BY_CHARACTER:
-						for character in CHARACTERS_LIST:
+						for character in ALL_CHARACTERS_LIST:
 							if character in source:
 								character_value = [character]
 								break
@@ -220,14 +244,14 @@ def connect_regions(multiworld: MultiWorld, player: int, source: str, exits: lis
 				if "Extra" in exit:
 					rule = makeExtraRule(player, character_value, mode, extra)
 
-		elif exit in ALL_CHARACTERS_LIST:
+		elif exit in CHARACTERS_LIST:
 			rule = makeCharacterRule(player, CHARACTER_TO_ITEM[exit])
 
 		sourceRegion = multiworld.get_region(source, player)
 		targetRegion = multiworld.get_region(exit, player)
 		sourceRegion.connect(targetRegion, rule=rule)
 
-def set_rules(multiworld: MultiWorld, player: int, spell_cards: list, treasure_final_spell_card: str):
+def set_rules(multiworld: MultiWorld, player: int, spell_cards: list, treasure_final_spell_card: str, capture_spell_cards_list: list, capture_spell_cards_count: int, spell_cards_teams: list):
 	difficulty_check = getattr(multiworld.worlds[player].options, "difficulty_check")
 	extra = getattr(multiworld.worlds[player].options, "extra_stage")
 	endingRequired = getattr(multiworld.worlds[player].options, "ending_required")
@@ -237,19 +261,20 @@ def set_rules(multiworld: MultiWorld, player: int, spell_cards: list, treasure_f
 	mode = getattr(multiworld.worlds[player].options, "mode")
 	time_check = getattr(multiworld.worlds[player].options, "time_check")
 	time = getattr(multiworld.worlds[player].options, "time")
+	characters = getattr(multiworld.worlds[player].options, "characters")
 
 	# If we're in Normal mode, we force both_stage_4 to be False
 	if mode in NORMAL_MODE:
 		both_stage_4 = False
 
-	if mode not in PRACTICE_MODE and mode not in NORMAL_MODE and goal != TREASURE_GOAL:
+	if mode not in PRACTICE_MODE and mode not in NORMAL_MODE and goal not in SPELL_GOALS:
 		goal = TREASURE_GOAL
 	elif mode not in SPELL_PRACTICE_MODE and goal == TREASURE_GOAL:
 		goal = ENDING_FINAL_B
 
 	# Regions
-	all_spell_cards = spell_cards + [treasure_final_spell_card] if treasure_final_spell_card != -1 else []
-	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check, mode, all_spell_cards)
+	all_spell_cards = spell_cards + ([treasure_final_spell_card] if treasure_final_spell_card != -1 else [])
+	regions = get_regions(difficulty_check, extra, exclude_lunatic, both_stage_4, time_check, mode, all_spell_cards, characters, spell_cards_teams)
 
 	for name, data in regions.items():
 		if data["exits"]:
@@ -289,11 +314,31 @@ def set_rules(multiworld: MultiWorld, player: int, spell_cards: list, treasure_f
 		if mode not in SPELL_PRACTICE_MODE:
 			goal = ENDING_FINAL_B
 
+	# We create a named list of the capture spell cards for the victory condition
+	named_capture_spell_cards_list = []
+	if capture_spell_cards_list:
+		for spell_id in capture_spell_cards_list:
+			spell_name = f"{spell_id} - {SPELL_CARDS_LIST[spell_id]['name']}"
+			named_capture_spell_cards_list.append(spell_name)
+
+	# Characters
+	characters_list = []
+	if characters == TEAM_ONLY:
+		characters_list = CHARACTERS_LIST
+	elif characters == SOLO_ONLY:
+		characters_list = SOLO_CHARACTERS_LIST
+	elif characters == ALL_CHARACTER:
+		characters_list = ALL_CHARACTERS_LIST
+
 	# Win condition.
 	multiworld.completion_condition[player] = lambda state: victoryCondition(player, state,
 																			(goal in [ENDING_FINAL_A, ENDING_ALL] and (mode in PRACTICE_MODE or mode in NORMAL_MODE)),
 																			(goal in [ENDING_FINAL_B, ENDING_ALL] and (mode in PRACTICE_MODE or mode in NORMAL_MODE)),
 																			(goal in [ENDING_EXTRA, ENDING_ALL] and extra != NO_EXTRA and (mode in PRACTICE_MODE or mode in NORMAL_MODE)),
 																			(goal in [TREASURE_GOAL] and mode in SPELL_PRACTICE_MODE),
+																			(goal == CAPTURE_GOAL and mode in SPELL_PRACTICE_MODE),
+																			characters_list,
+																			named_capture_spell_cards_list,
+																			capture_spell_cards_count,
 																			endingRequired
 																		)

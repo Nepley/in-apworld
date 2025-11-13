@@ -16,6 +16,7 @@ class gameHandler:
 	spell_cards = None
 	final_spell_card = None
 	treasures = 0
+	spell_cards_teams = []
 
 	difficulties = None
 	characters = None
@@ -110,12 +111,16 @@ class gameHandler:
 
 					self.gameController.setPracticeStageScore(character, difficulty, stage, score)
 
-	def updateExtraUnlock(self, otherMode = False):
+	def updateExtraUnlock(self, otherMode = False, forceAccess = False, mainMenu = False):
 		"""
 		Update access to the Extra stage
 		"""
-		canExtra = self.canExtra()
-		if canExtra or otherMode:
+		# If we are in the main menu and solo character have access to the extra stage, we force the access
+		if forceAccess and mainMenu:
+			self.gameController.setCharacterDifficulty(ILLUSION_TEAM, EXTRA, 0xFF)
+			return
+
+		if self.canExtra() or otherMode:
 			for characters in CHARACTERS:
 				if self.characters[characters] and (self.hasExtra[characters] or otherMode):
 					self.gameController.setCharacterDifficulty(characters, EXTRA, 0xFF)
@@ -125,12 +130,24 @@ class gameHandler:
 			for characters in CHARACTERS:
 				self.gameController.setCharacterDifficulty(characters, EXTRA, 0x00)
 
+		# Solo Character
+		if otherMode or self.canSoloExtra():
+			if self.characters[REIMU] and (self.hasExtra[REIMU] or otherMode):
+				self.gameController.soloCharacterState(True)
+			else:
+				self.gameController.soloCharacterState(False)
+		else:
+			self.gameController.soloCharacterState(False)
+
+	def forceSpellPracticeAccess(self, access):
+		self.gameController.setCharacterSpellPractice(ILLUSION_TEAM, access)
+
 	def updateSpellPracticeAccess(self, checked_location):
 		"""
 		Update access to the Spell Practice
 		"""
 		for character in CHARACTERS:
-			has_access = self.characters[character]
+			has_access = self.characters[character] and (CHARACTER_ID_TO_NAME[character] in self.spell_cards_teams or CHARACTER_ID_TO_NAME[character] in SOLO_CHARACTERS_LIST)
 			self.gameController.setCharacterSpellPractice(character, has_access)
 
 		for spell in self.spell_cards:
@@ -249,6 +266,13 @@ class gameHandler:
 				break
 
 		return can
+
+	def canSoloExtra(self):
+		"""
+		If solo character can access the Extra Stage
+		"""
+		# Since every solo character are unlocked at the same, we just check one character
+		return self.hasExtra[REIMU]
 
 	def getCharactersState(self):
 		return self.characters
@@ -423,16 +447,23 @@ class gameHandler:
 		self.difficulties[difficulty] = True
 
 	def unlockExtraStage(self, character = -1):
-		# Unlock for one character/shot type
-		if character > -1:
-			self.hasExtra[character] = True
 		# Unlock for one character
-		elif character > -1:
+		if character > -1:
 			self.hasExtra[character] = True
 		# Unlock for all characters
 		else:
 			for character in CHARACTERS:
 				self.hasExtra[character] = True
+
+	def unlockSoloExtraStage(self):
+		self.hasExtra[REIMU] = True
+		self.hasExtra[YUKARI] = True
+		self.hasExtra[MARISA] = True
+		self.hasExtra[ALICE] = True
+		self.hasExtra[SAKUYA] = True
+		self.hasExtra[REMILIA] = True
+		self.hasExtra[YOUMU] = True
+		self.hasExtra[YUYUKO] = True
 
 	def unlockCharacter(self, character):
 		self.characters[character] = True
@@ -468,6 +499,21 @@ class gameHandler:
 
 	def setFinalSpellCard(self, spell_id):
 		self.final_spell_card = spell_id
+
+	def unlockSoloCharacter(self):
+		self.characters[REIMU] = True
+		self.characters[YUKARI] = True
+		self.characters[MARISA] = True
+		self.characters[ALICE] = True
+		self.characters[SAKUYA] = True
+		self.characters[REMILIA] = True
+		self.characters[YOUMU] = True
+		self.characters[YUYUKO] = True
+
+		if not self.firstCharacterUnlocked:
+			self.firstCharacterUnlocked = True
+			if self.gameController.getMenu() not in [9, 11, 13]:
+				self.gameController.setCharacter(REIMU)
 
 	#
 	# Traps
@@ -546,7 +592,7 @@ class gameHandler:
 		self.gameController.initDifficultyHack()
 		self.gameController.setLockToAllDifficulty()
 		self.gameController.disableDemo()
-		self.gameController.forceLockSoloCharacter()
+		self.gameController.soloCharacterState(False)
 		self.gameController.initStageSelectHack()
 		self.gameController.setAllClearStats(0xFF)
 		self.gameController.setTimeGain(False)
@@ -608,6 +654,9 @@ class gameHandler:
 			for character in CHARACTERS:
 				self.spell_cards[id][character] = False
 				self.spell_cards_acquired[id][character] = False
+
+	def setSpellCardsTeams(self, spell_cards_teams):
+		self.spell_cards_teams = spell_cards_teams
 
 	def playSound(self, soundId):
 		self.gameController.setCustomSoundId(soundId)

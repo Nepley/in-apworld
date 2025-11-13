@@ -50,7 +50,7 @@ def getLocationMapping(difficulty):
 			continue
 
 		# Character
-		for character in CHARACTERS_LIST:
+		for character in ALL_CHARACTERS_LIST:
 			if (character in location):
 				character_id = CHARACTER_NAME_TO_ID[character]
 				break
