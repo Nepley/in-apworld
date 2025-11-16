@@ -437,11 +437,11 @@ class gameHandler:
 	def addEnding(self, character, type):
 		self.endings[character][type] += 1
 
-	def addTreasure(self):
+	def addTreasure(self, spell_id):
 		self.treasures += 1
 
 		if self.treasures >= 5:
-			self.unlockSpellCard(self.final_spell_card)
+			self.unlockSpellCard(spell_id)
 
 	def unlockDifficulty(self, difficulty):
 		self.difficulties[difficulty] = True
@@ -496,9 +496,6 @@ class gameHandler:
 	def setSpellCardAcquired(self, spell_id, character):
 		self.spell_cards_acquired[spell_id][character] = True
 		self.gameController.setSpellCardAcquired(spell_id, character, 1)
-
-	def setFinalSpellCard(self, spell_id):
-		self.final_spell_card = spell_id
 
 	def unlockSoloCharacter(self):
 		self.characters[REIMU] = True

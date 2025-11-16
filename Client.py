@@ -183,9 +183,9 @@ class TouhouClientProcessor(ClientCommandProcessor):
 				logger.error("No Treasure.")
 				return False
 			logger.info(f"Treasures collected: {self.ctx.handler.treasures}/5")
-			logger.info(f"Final Spell Card: {self.ctx.handler.final_spell_card}")
-			if self.options['nb_treasure_not_placed'] > 0:
-				logger.info(f"Note: {self.options['nb_treasure_not_placed']} treasure(s) were placed 'anywhere'.")
+			logger.info(f"Final Spell Card: {self.ctx.options['treasure_final_spell_card']}")
+			if self.ctx.options['nb_treasure_not_placed'] > 0:
+				logger.info(f"Note: {self.ctx.options['nb_treasure_not_placed']} treasure(s) were placed 'anywhere'.")
 			return True
 		else:
 			logger.error("Treasures cannot be accessed before connecting to the game and server")
@@ -978,7 +978,7 @@ class TouhouContext(CommonContext):
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 312 | 313 | 314 | 315 | 316: # Treasures
-					self.handler.addTreasure()
+					self.handler.addTreasure(self.options['treasure_final_spell_card'])
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
 				case 317: # Impossible Request Completed
@@ -1649,9 +1649,6 @@ class TouhouContext(CommonContext):
 			# If we're not playing in spell practice, we leave the loop since it would do nothing
 			if self.options['mode'] not in SPELL_PRACTICE_MODE:
 				return
-
-			if self.options['treasure_final_spell_card']:
-				self.handler.setFinalSpellCard(self.options['treasure_final_spell_card'])
 
 			self.handler.setSpellCardsTeams(self.options['spell_cards_teams'])
 

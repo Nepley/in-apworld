@@ -109,7 +109,7 @@ class DifficultyEnd(Choice):
 class ExtraStage(Choice):
 	"""
 	[Practice/Normal] Determine if the extra stage is included
-    Linear: The extra stage is considered as the 7th stage
+    Linear: The extra stage is considered as the 7th stage. Solo character will still have a separate item to unlock the extra stage.
     Apart: The extra stage has it's own item for it to be unlocked
     This option will follow the rule of how the stage are unlocked in Practice Mode (Global, By Character or By Shot Type)
 	"""
@@ -136,7 +136,6 @@ class NumberBombsExtra(Range):
 class DifficultyCheck(Choice):
 	"""
 	[Practice/Normal] If checks are separated by difficulty.
-    If true_with_lower, the check of the highest difficulty include the check of the lower difficulties that are unlocked
 	"""
 	display_name = "Difficulty Check"
 	option_false = 0
@@ -150,7 +149,7 @@ class CheckMultipleDifficulty(Toggle):
 
 class TimeCheck(Toggle):
 	"""
-	[Practice/Normal] If having enough Time and finishing (By dying or clearing it) the Last Spell at the end of a stage grant a check
+	[Practice/Normal] If having enough Time and finishing (by dying or clearing it) the Last Spell at the end of a stage grant a check
     Only stages where the Time Goal is above 0 are concerned (stage 1 to 5)
 	"""
 	display_name = "Time Check"
