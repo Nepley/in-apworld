@@ -70,7 +70,7 @@ class gameHandler:
 
 				self.gameController.setCharacterDifficulty(characters, difficulty, stage)
 
-	def updatePracticeScore(self, locations, checked_location):
+	def updatePracticeScore(self, locations, checked_location, time_location = False):
 		scores = {}
 		for character in CHARACTERS:
 			scores[character] = {}
@@ -103,11 +103,16 @@ class gameHandler:
 				for stage in range(8):
 					score = 0
 					if scores[character][difficulty][stage][0] > 0:
-						score += 555555555
+						if time_location and difficulty != EASY:
+							score += 444444444
+						else:
+							score += 555555555
 					if scores[character][difficulty][stage][1] > 0:
 						score += 222222222
 					if scores[character][difficulty][stage][1] > 1:
 						score += 222222222
+					if time_location and difficulty != EASY and scores[character][difficulty][stage][2] > 0:
+						score += 111111111
 
 					self.gameController.setPracticeStageScore(character, difficulty, stage, score)
 
@@ -353,6 +358,9 @@ class gameHandler:
 	def getPlayerState(self):
 		return self.gameController.getPlayerState()
 
+	def isInSpellPractice(self):
+		return self.gameController.getIsNotInSpellPractice() == 0
+
 	#
 	# Set Items Functions
 	#
@@ -476,6 +484,7 @@ class gameHandler:
 				self.gameController.setCharacter(character)
 
 	def unlockTimeGain(self):
+		self.time_gain = True
 		self.gameController.setTimeGain(True)
 
 	def setLivesLimit(self, limit):
@@ -497,7 +506,14 @@ class gameHandler:
 		self.spell_cards_acquired[spell_id][character] = True
 		self.gameController.setSpellCardAcquired(spell_id, character, 1)
 
+	def resetSpellCardValues(self, spell_id):
+		for character in CHARACTERS:
+			self.gameController.setSpellCardUnlock(spell_id, character, 0)
+			self.gameController.setSpellCardChallenged(spell_id, character, 0)
+			self.gameController.setSpellCardAcquired(spell_id, character, 0)
+
 	def unlockSoloCharacter(self):
+		self.solo_character_unlocked = True
 		self.characters[REIMU] = True
 		self.characters[YUKARI] = True
 		self.characters[MARISA] = True
@@ -572,6 +588,7 @@ class gameHandler:
 		self.initGame()
 
 	def initGame(self):
+		self.firstCharacterUnlocked = False
 		self.gameController.initAntiTemperHack()
 
 		self.gameController.initStartingLives()
@@ -589,10 +606,10 @@ class gameHandler:
 		self.gameController.initDifficultyHack()
 		self.gameController.setLockToAllDifficulty()
 		self.gameController.disableDemo()
-		self.gameController.soloCharacterState(False)
+		self.gameController.soloCharacterState(self.solo_character_unlocked)
 		self.gameController.initStageSelectHack()
 		self.gameController.setAllClearStats(0xFF)
-		self.gameController.setTimeGain(False)
+		self.gameController.setTimeGain(self.time_gain)
 		self.setLockToSpellPractice()
 		self.gameController.setLastWordHack()
 
@@ -606,6 +623,9 @@ class gameHandler:
 		self.power = 0
 		self.continues = 0
 		self.time_point = 0
+
+		self.solo_character_unlocked = False
+		self.time_gain = False
 
 		self.stages = {}
 		for character in CHARACTERS:
@@ -638,8 +658,6 @@ class gameHandler:
 			self.extraBeaten[character] = [False, False]
 
 		self.lastSpeeds = [0, 0, 0, 0]
-
-		self.firstCharacterUnlocked = False
 
 		self.spell_cards = {}
 		self.spell_cards_acquired = {}

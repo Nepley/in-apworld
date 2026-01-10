@@ -171,6 +171,7 @@ class gameController:
 		self.addrCharacterDefaultCursorCondition = self.pm.base_address+ADDR_CHARACTER_DEFAULT_CURSOR_CONDITION
 		self.addrSoloCharacterConditions = [self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[0], self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[1], self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[2], self.pm.base_address+ADDR_SOLO_CHARACTER_CONDITIONS[3]]
 		self.addrHYGaugeHack = self.pm.base_address+ADDR_HY_GAUGE_HACK
+		self.addrIsNotInSpellPractice = self.pm.base_address+ADDR_IS_NOT_IN_SPELL_PRACTICE
 
 		self.addrKillCondition = self.pm.base_address+ADDR_KILL_CONDITION
 
@@ -185,6 +186,10 @@ class gameController:
 		self.addrLifeHack2 = self.pm.base_address+ADDR_LIVES_HACK_2
 		self.addrBombHack1 = self.pm.base_address+ADDR_BOMB_HACK_1
 		self.addrBombHack2 = self.pm.base_address+ADDR_BOMB_HACK_2
+		self.addrBombHack3 = self.pm.base_address+ADDR_BOMB_HACK_3
+		self.addrBombHack4 = self.pm.base_address+ADDR_BOMB_HACK_4
+		self.addrBombHack5 = self.pm.base_address+ADDR_BOMB_HACK_5
+		self.addrBombHack6 = self.pm.base_address+ADDR_BOMB_HACK_6
 		self.addrPowerHack1 = self.pm.base_address+ADDR_POWER_HACK_1
 		self.addrPowerHack2 = self.pm.base_address+ADDR_POWER_HACK_2
 		self.addrPowerHack3 = self.pm.base_address+ADDR_POWER_HACK_3
@@ -1065,6 +1070,9 @@ class gameController:
 		self.addrMenuCursor = getPointerAddress(self.pm, self.pm.base_address+ADDR_MENU_CURSOR[0], ADDR_MENU_CURSOR[1:])
 		return int.from_bytes(self.pm.read_bytes(self.addrMenuCursor, 1))
 
+	def getIsNotInSpellPractice(self):
+		return int.from_bytes(self.pm.read_bytes(self.addrIsNotInSpellPractice, 1))
+
 	def getNormalSpeed(self):
 		self.addrNormalSpeed = getPointerAddress(self.pm, self.pm.base_address+ADDR_NORMAL_SPEED[0], ADDR_NORMAL_SPEED[1:])
 		return self.pm.read_float(self.addrNormalSpeed)
@@ -1792,7 +1800,11 @@ class gameController:
 
 	def initStartingBombs(self):
 		self.pm.write_bytes(self.addrBombHack1, bytes([0xC7, 0x81, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xEB, 0x19]), 12)
-		self.pm.write_bytes(self.addrBombHack2, bytes([0x90, 0x90, 0x90, 0x90, 0xEB, 0xDB]), 6)
+		self.pm.write_bytes(self.addrBombHack2, bytes([0x83, 0x7D, 0x08, 0x00, 0x75, 0xDB]), 6)
+		self.pm.write_bytes(self.addrBombHack3, bytes([0x8B, 0x45, 0xFC, 0x8B, 0x48, 0x08, 0xEB, 0xA9, 0x90]), 9)
+		self.pm.write_bytes(self.addrBombHack4, bytes([0xE9, 0xD5, 0x00, 0x00, 0x00]), 5)
+		self.pm.write_bytes(self.addrBombHack5, bytes([0x31, 0xC0, 0x89, 0x81, 0x80, 0x00, 0x00, 0x00, 0xEB, 0xD0]), 10)
+		self.pm.write_bytes(self.addrBombHack6, bytes([0xEB, 0xA2]), 2)
 
 	def initPowerHack(self):
 		self.pm.write_bytes(self.addrPowerHack1, bytes([0x90, 0x90]), 2)

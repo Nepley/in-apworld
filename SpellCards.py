@@ -15338,7 +15338,7 @@ SPELL_CARDS_LIST = {
 	"217": {
 		"difficulty": 4,
 		"stage": "Last Word",
-		"name": "\"Deflation Star\"",
+		"name": "\"Deflation World\"",
 		"all_character_addresses": {
 			"acquired": 19057804,
 			"challenged": 19057752

@@ -221,6 +221,22 @@ class DuplicateSpellCards(Range):
 	range_end = 100
 	default = 0
 
+class ExcludedSpellCards(OptionSet):
+	"""
+	[Spell Practice] Choose which Spell Cards will be excluded from the item pool.
+	Spell cards are identified by their id. They must be written like this: "XXX" ("001" to "222")
+	"""
+	display_name = "Excluded Spell Cards"
+	default = []
+
+class IncludedSpellCards(OptionSet):
+	"""
+	[Spell Practice] Choose which Spell Cards will be included in the item pool. They will be included even if they should be excluded by other filters.
+	Spell cards are identified by their id. They must be written like this: "XXX" ("001" to "222")
+	"""
+	display_name = "Included Spell Cards"
+	default = []
+
 class Goal(Choice):
 	"""
 	Determine the goal.
@@ -482,6 +498,8 @@ class Th08Options(PerGameCommonOptions):
 	spell_card_stages: SpellCardStages
 	max_spell_card_count: MaxSpellCardCount
 	duplicate_spell_cards: DuplicateSpellCards
+	excluded_spell_cards: ExcludedSpellCards
+	included_spell_cards: IncludedSpellCards
 	goal: Goal
 	ending_required: EndingRequired
 	treasure_location: TreasureLocation

@@ -53,5 +53,5 @@ for difficulty in DIFFICULTY_LIST:
 # Spell Cards
 for character in ALL_CHARACTERS_LIST:
 	for id, spell in SPELL_CARDS_LIST.items():
-		# location_id = STARTING_ID + 6000 + character_id + spell_card_id
+		# location_id = STARTING_ID + 60000 + character_id + spell_card_id
 		location_table[f"[{character}] {id} - {spell['name']}"] = STARTING_ID + int("6"+str(CHARACTER_NAME_TO_ID[character])+id)

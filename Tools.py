@@ -16,6 +16,10 @@ def getLocationMapping(difficulty):
 	stage_specific_location_id = {"stage_6": [], "extra": []}
 
 	for location, id in location_table.items():
+		# We ignore spell card locations
+		if id >= STARTING_ID + 60000:
+			continue
+
 		character_id = 0
 		level = -1
 		counter = 0
@@ -51,7 +55,7 @@ def getLocationMapping(difficulty):
 
 		# Character
 		for character in ALL_CHARACTERS_LIST:
-			if (character in location):
+			if f"[{character}]" in location:
 				character_id = CHARACTER_NAME_TO_ID[character]
 				break
 

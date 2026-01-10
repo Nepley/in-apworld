@@ -10,6 +10,7 @@ from .Regions import create_regions
 from .Rules import set_rules
 from .SpellCards import SPELL_CARDS_LIST
 from BaseClasses import Item, ItemClassification
+import re
 
 def launch_client():
 	"""Launch a client instance"""
@@ -48,10 +49,13 @@ class TWorld(World):
 		treasure_final_spell_card = getattr(self.options, "treasure_final_spell_card")
 		treasure_location = getattr(self.options, "treasure_location")
 		capture_spell_cards_stage = getattr(self.options, "capture_spell_cards_stage")
+		excluded_spell_cards = getattr(self.options, "excluded_spell_cards")
+		int_included_spell_cards = getattr(self.options, "included_spell_cards")
 		self.capture_spell_cards_count = getattr(self.options, "capture_spell_cards_count")
 		characters = getattr(self.options, "characters")
 		spell_cards_teams = getattr(self.options, "spell_cards_teams")
 		self.characters_list = []
+		included_spell_cards = []
 
 		goal = getattr(self.options, "goal")
 
@@ -96,6 +100,19 @@ class TWorld(World):
 
 				if not keep:
 					self.spell_cards.remove(id)
+
+			# We remove the blacklisted spell cards from the pool
+			for spell in excluded_spell_cards:
+				if re.match(r'^[0-2][0-9][0-9]$', spell):
+					if spell in self.spell_cards:
+						self.spell_cards.remove(spell)
+
+			# We add the whitelisted spell cards to the pool (if they are not already present)
+			for spell in int_included_spell_cards:
+				if re.match(r'^[0-2][0-9][0-9]$', spell):
+					included_spell_cards.append(spell)
+					if spell not in self.spell_cards:
+						self.spell_cards.append(spell)
 
 			# If we already have 0 spell cards, We force all spell cards from stage 1 to be available
 			if len(self.spell_cards) == 0:
@@ -184,17 +201,24 @@ class TWorld(World):
 			# If we still have more spell cards than the maximum allowed, we remove some randomly
 			if len(self.spell_cards) > max_spell_card_count:
 				self.random.shuffle(self.spell_cards)
-				# If we're in Capture Spell Cards goal, we remove first the spell cards that are not needed for the goal
+				# If we're in Capture Spell Cards goal, we remove first the spell cards that are not needed for the goal or whitelisted
 				if goal == CAPTURE_GOAL and len(self.capture_spell_cards_list) < len(self.spell_cards):
-					not_needed = [spell for spell in self.spell_cards if spell not in self.capture_spell_cards_list]
+					not_needed = [spell for spell in self.spell_cards if spell not in self.capture_spell_cards_list and spell not in included_spell_cards]
 					if len(not_needed) >= (len(self.spell_cards) - max_spell_card_count):
 						self.spell_cards = [spell for spell in self.spell_cards if spell not in not_needed[:len(self.spell_cards) - max_spell_card_count]]
 					else:
 						# If we don't have enough "not needed" spell cards, we remove all of them and then remove randomly the remaining needed spell cards
-						self.spell_cards = [spell for spell in self.spell_cards if spell not in not_needed]
+						self.spell_cards = [spell for spell in self.spell_cards if spell not in not_needed and spell not in included_spell_cards]
 						self.spell_cards = self.spell_cards[:max_spell_card_count]
+				# else we only remove the spell cards that are not whitelisted first
 				else:
-					self.spell_cards = self.spell_cards[:max_spell_card_count]
+					not_needed = [spell for spell in self.spell_cards if spell not in included_spell_cards]
+					if len(not_needed) >= (len(self.spell_cards) - max_spell_card_count):
+						self.spell_cards = [spell for spell in self.spell_cards if spell not in not_needed[:len(self.spell_cards) - max_spell_card_count]]
+					else:
+						# If we don't have enough "not needed" spell cards, we remove all of them and then remove randomly the remaining needed spell cards
+						self.spell_cards = [spell for spell in self.spell_cards if spell not in included_spell_cards]
+						self.spell_cards = self.spell_cards[:max_spell_card_count]
 
 				# We refill the capture spell cards list with the remaining spell cards
 				if goal == CAPTURE_GOAL:

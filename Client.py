@@ -209,14 +209,17 @@ class TouhouContext(CommonContext):
 		super().__init__(server_address, password)
 		self.game = DISPLAY_NAME
 		self.items_handling = 0b111  # Item from starting inventory, own world and other world
-		self.pending_death_link = False
 		self.command_processor = TouhouClientProcessor
+		self.reset()
+
+	def reset(self):
+		self.handler = None # gameHandler
+		self.pending_death_link = False
 
 		self.current_power_point = -1
 		self.ring_link_id = None
 		self.last_power_point = -1
 
-		self.handler = None # gameHandler
 		self.inError = False
 		self.msgQueue = []
 
@@ -239,6 +242,7 @@ class TouhouContext(CommonContext):
 		self.death_link_trigger = DEATH_LINK_LIFE
 
 		# Spell Card
+		self.spell_cards_unlocked = []
 		self.capture_spell_cards_list = []
 		self.victory_sent = False
 
@@ -325,7 +329,7 @@ class TouhouContext(CommonContext):
 			return
 
 		logger.info("Waiting for connect from server...")
-		while not self.client_recieved_initial_server_data():
+		while not self.client_recieved_initial_server_data() and not self.exit_event.is_set():
 			await asyncio.sleep(1)
 
 	async def give_item(self, items):
@@ -793,162 +797,162 @@ class TouhouContext(CommonContext):
 					self.handler.addStage(3, ALICE, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 278: # [Alice] Stage 4B
+				case 277: # [Alice] Stage 4B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(4, ALICE, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 279: # [Alice] Stage 5
+				case 278: # [Alice] Stage 5
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(5, ALICE, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 280: # [Alice] Stage 6A
+				case 279: # [Alice] Stage 6A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(6, ALICE, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 281: # [Alice] Stage 6B
+				case 280: # [Alice] Stage 6B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(7, ALICE, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 282: # [Sakuya] Stage 2
+				case 281: # [Sakuya] Stage 2
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(1, SAKUYA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 283: # [Sakuya] Stage 3
+				case 282: # [Sakuya] Stage 3
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(2, SAKUYA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 284: # [Sakuya] Stage 4A
+				case 283: # [Sakuya] Stage 4A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(3, SAKUYA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 285: # [Sakuya] Stage 4B
+				case 284: # [Sakuya] Stage 4B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(4, SAKUYA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 286: # [Sakuya] Stage 5
+				case 285: # [Sakuya] Stage 5
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(5, SAKUYA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 287: # [Sakuya] Stage 6A
+				case 286: # [Sakuya] Stage 6A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(6, SAKUYA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 288: # [Sakuya] Stage 6B
+				case 287: # [Sakuya] Stage 6B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(7, SAKUYA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 289: # [Remilia] Stage 2
+				case 288: # [Remilia] Stage 2
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(1, REMILIA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 290: # [Remilia] Stage 3
+				case 289: # [Remilia] Stage 3
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(2, REMILIA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 291: # [Remilia] Stage 4A
+				case 290: # [Remilia] Stage 4A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(3, REMILIA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 292: # [Remilia] Stage 4B
+				case 291: # [Remilia] Stage 4B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(4, REMILIA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 293: # [Remilia] Stage 5
+				case 292: # [Remilia] Stage 5
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(5, REMILIA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 294: # [Remilia] Stage 6A
+				case 293: # [Remilia] Stage 6A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(6, REMILIA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 295: # [Remilia] Stage 6B
+				case 294: # [Remilia] Stage 6B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(7, REMILIA, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 296: # [Youmu] Stage 2
+				case 295: # [Youmu] Stage 2
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(1, YOUMU, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 297: # [Youmu] Stage 3
+				case 296: # [Youmu] Stage 3
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(2, YOUMU, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 298: # [Youmu] Stage 4A
+				case 297: # [Youmu] Stage 4A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(3, YOUMU, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 299: # [Youmu] Stage 4B
+				case 298: # [Youmu] Stage 4B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(4, YOUMU, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2100: # [Youmu] Stage 5
+				case 299: # [Youmu] Stage 5
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(5, YOUMU, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2101: # [Youmu] Stage 6A
+				case 2100: # [Youmu] Stage 6A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(6, YOUMU, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2102: # [Youmu] Stage 6B
+				case 2101: # [Youmu] Stage 6B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(7, YOUMU, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2103: # [Yuyuko] Stage 2
+				case 2102: # [Yuyuko] Stage 2
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(1, YUYUKO, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2104: # [Yuyuko] Stage 3
+				case 2103: # [Yuyuko] Stage 3
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(2, YUYUKO, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2105: # [Yuyuko] Stage 4A
+				case 2104: # [Yuyuko] Stage 4A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(3, YUYUKO, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2106: # [Yuyuko] Stage 4B
+				case 2105: # [Yuyuko] Stage 4B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(4, YUYUKO, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2107: # [Yuyuko] Stage 5
+				case 2106: # [Yuyuko] Stage 5
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(5, YUYUKO, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2108: # [Yuyuko] Stage 6A
+				case 2107: # [Yuyuko] Stage 6A
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(6, YUYUKO, bothStage4)
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
-				case 2109: # [Yuyuko] Stage 6B
+				case 2108: # [Yuyuko] Stage 6B
 					bothStage4 = self.options['both_stage_4']
 					self.handler.addStage(7, YUYUKO, bothStage4)
 					gotAnyItem = True
@@ -1020,6 +1024,7 @@ class TouhouContext(CommonContext):
 					if item_id > 6000 and item_id < 7000: # Spell Card
 						spell_id = str(item_id)[1:]
 						self.handler.unlockSpellCard(spell_id)
+						self.spell_cards_unlocked.append(spell_id)
 						gotAnyItem = True
 						self.msgQueue.append({"msg": "SC"+spell_id, "color": FLASHING_TEXT})
 					else:
@@ -1123,6 +1128,7 @@ class TouhouContext(CommonContext):
 		goal = self.options['goal']
 		type = self.options['ending_required']
 		extra = self.options['extra_stage']
+		characters = CHARACTERS if self.options['characters'] == ALL_CHARACTER else (TEAMS if self.options['characters'] == TEAM_ONLY else SOLO_CHARACTERS)
 
 		normal_a_victory = True
 		normal_b_victory = True
@@ -1131,28 +1137,28 @@ class TouhouContext(CommonContext):
 		if (goal == ENDING_FINAL_A or goal == ENDING_ALL):
 			if type == ONE_ENDING:
 				normal_a_victory = False
-				for character in CHARACTERS:
+				for character in characters:
 					normal_a_victory = normal_a_victory or self.handler.endings[character][ENDING_FINAL_A]
 			elif type == ALL_CHARACTER_ENDING:
-				for character in CHARACTERS:
+				for character in characters:
 					normal_a_victory = normal_a_victory and self.handler.endings[character][ENDING_FINAL_A]
 
 		if (goal == ENDING_FINAL_B or goal == ENDING_ALL) or (extra == NO_EXTRA and goal == ENDING_EXTRA):
 			if type == ONE_ENDING:
 				normal_b_victory = False
-				for character in CHARACTERS:
+				for character in characters:
 					normal_b_victory = normal_b_victory or self.handler.endings[character][ENDING_FINAL_B]
 			elif type == ALL_CHARACTER_ENDING:
-				for character in CHARACTERS:
+				for character in characters:
 					normal_b_victory = normal_b_victory and self.handler.endings[character][ENDING_FINAL_B]
 
 		if (goal == ENDING_EXTRA or goal == ENDING_ALL) and extra != NO_EXTRA:
 			if type == ONE_ENDING:
 				extra_victory = False
-				for character in CHARACTERS:
+				for character in characters:
 					extra_victory = extra_victory or self.handler.endings[character][ENDING_EXTRA]
 			elif type == ALL_CHARACTER_ENDING:
-				for character in CHARACTERS:
+				for character in characters:
 					extra_victory = extra_victory and self.handler.endings[character][ENDING_EXTRA]
 
 		return normal_a_victory and normal_b_victory and extra_victory
@@ -1181,9 +1187,8 @@ class TouhouContext(CommonContext):
 			currentScore = 0
 			currentContinue = 0
 			currentStage = 0
-			previous_menu = 0
 
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				await asyncio.sleep(0.5)
 				gameMode = self.handler.getGameMode()
 				# If we failed to get the game mode, we skip the loop
@@ -1193,7 +1198,7 @@ class TouhouContext(CommonContext):
 				# Mode Check
 				if(gameMode == IN_GAME and not noCheck):
 					# If we are in spell practice, we do nothing
-					if previous_menu == SPELL_CARD_STAGE_SELECT:
+					if self.handler.isInSpellPractice():
 						continue
 
 					# A level has started
@@ -1269,9 +1274,6 @@ class TouhouContext(CommonContext):
 						currentMode = 1
 						resourcesGiven = False
 						noCheck = False # We enable the checks once we're in the menu
-					menu = self.handler.getMenu()
-					if menu > 0 and menu < 20:
-						previous_menu = menu
 		except Exception as e:
 			logger.error(f"Main ERROR:")
 			logger.error(traceback.format_exc())
@@ -1298,7 +1300,7 @@ class TouhouContext(CommonContext):
 			if solo_characters:
 				self.handler.unlockSoloCharacter()
 
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				await asyncio.sleep(0.1)
 				game_mode = self.handler.getGameMode()
 				# If we failed to get the game mode, we skip the loop
@@ -1368,7 +1370,7 @@ class TouhouContext(CommonContext):
 			currentScore = 0
 			currentContinue = 0
 			restarted = False
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				await asyncio.sleep(1)
 				game_mode = self.handler.getGameMode()
 				# If we failed to get the game mode, we skip the loop
@@ -1489,7 +1491,7 @@ class TouhouContext(CommonContext):
 			nb_death = 0
 			previous_menu = 0
 
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				if(self.death_link_is_active):
 					await asyncio.sleep(0.5)
 				else:
@@ -1553,7 +1555,7 @@ class TouhouContext(CommonContext):
 		Loop that handles displaying message
 		"""
 		try:
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				if self.msgQueue != []:
 					msg = self.msgQueue[0]
 					self.msgQueue.pop(0)
@@ -1575,7 +1577,7 @@ class TouhouContext(CommonContext):
 			self.ring_link_id = random.randint(0, 999999)
 			self.timer = 0.5
 
-			while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+			while not self.exit_event.is_set() and self.handler and not self.inError:
 				if(self.ring_link_is_active):
 					await asyncio.sleep(self.timer)
 				else:
@@ -1616,8 +1618,9 @@ class TouhouContext(CommonContext):
 		Loop that handles the guard rail
 		"""
 		mode = self.options['mode']
+		in_menu = False
 		guard_rail = GuardRail(self.handler.gameController, self.handler, self.options)
-		while not self.exit_event.is_set() and self.handler.gameController and not self.inError:
+		while not self.exit_event.is_set() and self.handler and not self.inError:
 			try:
 				await asyncio.sleep(5)
 				result = guard_rail.check_memory_addresses()
@@ -1625,6 +1628,10 @@ class TouhouContext(CommonContext):
 					logger.error(f"Memory ERROR: {result['message']}")
 
 				if self.handler.getGameMode() != IN_GAME:
+					if not in_menu:
+						await asyncio.sleep(2)  # Give some time for the menu to fully load
+						in_menu = True
+
 					result = guard_rail.check_cursor_state()
 					if result["error"]:
 						logger.error(f"Cursor State ERROR: {result['message']}")
@@ -1637,9 +1644,12 @@ class TouhouContext(CommonContext):
 						result = guard_rail.check_spell_cards()
 						if result["error"]:
 							logger.error(f"Spell Card ERROR: {result['message']}")
+				else:
+					in_menu = False
 			except Exception as e:
 				logger.error(f"GuardRail ERROR: {e}")
 				logger.error(traceback.format_exc())
+				self.inError = True
 
 	async def spell_card_loop(self):
 		"""
@@ -1659,16 +1669,22 @@ class TouhouContext(CommonContext):
 				new_spell_cards = []
 				for id, spell in spell_card_acquired.items():
 					for character in CHARACTERS:
-						if spell[character] != spell_card_acquired_in_game[id][character]:
-							self.handler.setSpellCardAcquired(id, character)
-							if spell[character]:
-								item_id = STARTING_ID + int("6"+str(character)+id)
-								new_spell_cards.append(item_id)
+						# We check if the spell card is unlocked to avoid potential issues
+						if id in self.spell_cards_unlocked:
+							if spell[character] != spell_card_acquired_in_game[id][character]:
+								self.handler.setSpellCardAcquired(id, character)
+								if spell[character]:
+									item_id = STARTING_ID + int("6"+str(character)+id)
+									new_spell_cards.append(item_id)
 
-								# If we're in capture goal, we add the spell card to the list if it's not already present and it's valid spell card
-								if self.options['goal'] == CAPTURE_GOAL and id not in self.capture_spell_cards_list:
-									if id in self.options['capture_spell_cards_list']:
-										self.capture_spell_cards_list.append(id)
+									# If we're in capture goal, we add the spell card to the list if it's not already present and it's valid spell card
+									if self.options['goal'] == CAPTURE_GOAL and id not in self.capture_spell_cards_list:
+										if id in self.options['capture_spell_cards_list']:
+											self.capture_spell_cards_list.append(id)
+						else:
+							# If the spell card is acquired but not unlocked, we reset it in the game
+							if spell[character] != spell_card_acquired_in_game[id][character]:
+								self.handler.resetSpellCardValues(id)
 
 				if new_spell_cards:
 					await self.send_msgs([{"cmd": 'LocationChecks', "locations": new_spell_cards}])
@@ -1698,7 +1714,6 @@ class TouhouContext(CommonContext):
 		"""
 		Reconnect to client to the game process without resetting everything
 		"""
-		self.handler.gameController = None
 
 		while not self.handler.gameController:
 			try:
@@ -1718,8 +1733,10 @@ async def game_watcher(ctx: TouhouContext):
 	await ctx.wait_for_initial_connection_info()
 
 	while not ctx.exit_event.is_set():
+		# client disconnected from server
 		if not ctx.server:
-			# client disconnected from server
+			# We reset the context
+			ctx.reset()
 			await ctx.wait_for_initial_connection_info()
 
 		# First connection
@@ -1732,6 +1749,8 @@ async def game_watcher(ctx: TouhouContext):
 		# Connection following an error
 		if ctx.inError:
 			logger.info(f"Connection lost. Waiting for connection to {SHORT_NAME}...")
+			ctx.handler.gameController = None
+
 			asyncio.create_task(ctx.reconnect_to_game())
 			await asyncio.sleep(1)
 			while(ctx.handler.gameController is None and not ctx.exit_event.is_set()):
@@ -1742,14 +1761,15 @@ async def game_watcher(ctx: TouhouContext):
 			logger.info(f"{SHORT_NAME} process found. Starting loop...")
 
 			# We start all the diffrent loops
-			asyncio.create_task(ctx.main_loop())
-			asyncio.create_task(ctx.menu_loop())
-			asyncio.create_task(ctx.trap_loop())
-			asyncio.create_task(ctx.message_loop())
-			asyncio.create_task(ctx.guard_rail_loop())
-			asyncio.create_task(ctx.death_link_loop())
-			asyncio.create_task(ctx.ring_link_loop())
-			asyncio.create_task(ctx.spell_card_loop())
+			loops = []
+			loops.append(asyncio.create_task(ctx.main_loop()))
+			loops.append(asyncio.create_task(ctx.menu_loop()))
+			loops.append(asyncio.create_task(ctx.trap_loop()))
+			loops.append(asyncio.create_task(ctx.message_loop()))
+			loops.append(asyncio.create_task(ctx.guard_rail_loop()))
+			loops.append(asyncio.create_task(ctx.death_link_loop()))
+			loops.append(asyncio.create_task(ctx.ring_link_loop()))
+			loops.append(asyncio.create_task(ctx.spell_card_loop()))
 
 			# We update the locations checked if there was any location that was already checked before the connection
 			await ctx.update_locations_checked()
@@ -1774,8 +1794,15 @@ async def game_watcher(ctx: TouhouContext):
 			ctx.handler.setBombsLimit(ctx.options['limit_bombs'])
 
 			# Infinite loop while there is no error. If there is an error, we exit this loop in order to restart the connection
-			while not ctx.exit_event.is_set() and not ctx.inError:
+			while not ctx.exit_event.is_set() and ctx.server and not ctx.inError:
 				await asyncio.sleep(1)
+
+			# If we're here, we stop all the loops
+			for loop in loops:
+				try:
+					loop.cancel()
+				except:
+					pass
 
 def launch():
 	"""
