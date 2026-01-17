@@ -162,7 +162,7 @@ class gameHandler:
 				item_id = STARTING_ID + int("6"+str(character)+spell)
 
 				# If the spell card has been checked but the acquired value in game is at 0, we bump it to 1
-				if item_id in checked_location and self.gameController.getSpellCardAcquired(spell, character) == 0:
+				if value == 1 and item_id in checked_location and self.gameController.getSpellCardAcquired(spell, character) == 0:
 					self.gameController.setSpellCardChallenged(spell, character, 1)
 					self.gameController.setSpellCardAcquired(spell, character, 1)
 					all_character_challenged = self.gameController.getAllCharacterSpellCardChallenged(spell)

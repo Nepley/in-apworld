@@ -985,6 +985,10 @@ class TouhouContext(CommonContext):
 					self.handler.addTreasure(self.options['treasure_final_spell_card'])
 					gotAnyItem = True
 					self.msgQueue.append({"msg": SHORT_ITEM_NAME[item_id], "color": FLASHING_TEXT})
+
+					# If the final spell card is unlocked, we put it in the list so the client know we have access to it
+					if self.handler.treasures >= 5:
+						self.spell_cards_unlocked.append(self.options['treasure_final_spell_card'])
 				case 317: # Impossible Request Completed
 					if self.options['goal'] == TREASURE_GOAL:
 						await self.send_msgs([{"cmd": 'StatusUpdate', "status": 30}])
@@ -1537,6 +1541,7 @@ class TouhouContext(CommonContext):
 									logger.info(f"DeathLink: {nb_death}/{self.death_link_amnesty}")
 
 						currentMisses += 1
+						await asyncio.sleep(1)  # We wait a little
 					# If no death has occured but a death link is pending, we try to kill the player
 					elif self.pending_death_link:
 						await self.handler.killPlayer()
