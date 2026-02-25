@@ -491,11 +491,10 @@ class TWorld(World):
 			# If the goal is the treasures, we create the items needed and select the final spell card
 			if goal == TREASURE_GOAL:
 				# We place the ending on the final spell card
-				ending_treasure = self.create_item(ENDING_TREASURE)
 				final_spell = SPELL_CARDS_LIST[self.treasure_final_spell_card]
 				for character in self.characters_list:
 					name = f"[{character}] {self.treasure_final_spell_card} - {final_spell['name']}"
-					self.multiworld.get_location(name, self.player).place_locked_item(ending_treasure)
+					self.multiworld.get_location(name, self.player).place_locked_item(self.create_item(ENDING_TREASURE))
 					number_placed_item += 1
 
 				# Failsafe
