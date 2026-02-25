@@ -26,19 +26,17 @@ class TouhouClientProcessor(ClientCommandProcessor):
 		if self.ctx.handler is not None and self.ctx.handler.gameController is not None:
 			if active is not None:
 				if active.lower() in ["on", "true"]:
-					if "DeathLink" not in self.ctx.tags:
-						self.ctx.check_multiple_difficulty = True
-						changed = True
+					self.ctx.check_multiple_difficulty = True
+					changed = True
 					logger.info("Multiple difficulty check enabled")
 				elif active.lower() in ("off", "false"):
-					if "DeathLink" in self.ctx.tags:
-						self.ctx.check_multiple_difficulty = False
-						changed = True
+					self.ctx.check_multiple_difficulty = False
+					changed = True
 					logger.info("Multiple difficulty check disabled")
 				else:
 					logger.error("Invalid argument, use 'on' or 'off'")
 			else:
-				logger.info(f"Multiple difficulty check is {'enabled' if self.ctx.death_link_is_active else 'disabled'}")
+				logger.info(f"Multiple difficulty check is {'enabled' if self.ctx.check_multiple_difficulty else 'disabled'}")
 		else:
 			logger.error("Multiple difficulty check cannot be changed before connecting to the game and server")
 

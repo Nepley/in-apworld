@@ -603,102 +603,64 @@ class TWorld(World):
 
 		# Endings
 		if mode in PRACTICE_MODE or mode in NORMAL_MODE:
-			# Creating and placing Endings
-			ending_final_a_illusion = self.create_item("[Illusion Team] Ending - Eirin")
-			ending_final_a_magic = self.create_item("[Magic Team] Ending - Eirin")
-			ending_final_a_devil = self.create_item("[Devil Team] Ending - Eirin")
-			ending_final_a_nether = self.create_item("[Nether Team] Ending - Eirin")
-			ending_final_b_illusion = self.create_item("[Illusion Team] Ending - Kaguya")
-			ending_final_b_magic = self.create_item("[Magic Team] Ending - Kaguya")
-			ending_final_b_devil = self.create_item("[Devil Team] Ending - Kaguya")
-			ending_final_b_nether = self.create_item("[Nether Team] Ending - Kaguya")
-			ending_extra_illusion = self.create_item("[Illusion Team] Ending - Mokou")
-			ending_extra_magic = self.create_item("[Magic Team] Ending - Mokou")
-			ending_extra_devil = self.create_item("[Devil Team] Ending - Mokou")
-			ending_extra_nether = self.create_item("[Nether Team] Ending - Mokou")
-			ending_final_a_reimu = self.create_item("[Reimu] Ending - Eirin")
-			ending_final_a_yukari = self.create_item("[Yukari] Ending - Eirin")
-			ending_final_a_marisa = self.create_item("[Marisa] Ending - Eirin")
-			ending_final_a_alice = self.create_item("[Alice] Ending - Eirin")
-			ending_final_a_sakuya = self.create_item("[Sakuya] Ending - Eirin")
-			ending_final_a_remilia = self.create_item("[Remilia] Ending - Eirin")
-			ending_final_a_youmu = self.create_item("[Youmu] Ending - Eirin")
-			ending_final_a_yuyuko = self.create_item("[Yuyuko] Ending - Eirin")
-			ending_final_b_reimu = self.create_item("[Reimu] Ending - Kaguya")
-			ending_final_b_yukari = self.create_item("[Yukari] Ending - Kaguya")
-			ending_final_b_marisa = self.create_item("[Marisa] Ending - Kaguya")
-			ending_final_b_alice = self.create_item("[Alice] Ending - Kaguya")
-			ending_final_b_sakuya = self.create_item("[Sakuya] Ending - Kaguya")
-			ending_final_b_remilia = self.create_item("[Remilia] Ending - Kaguya")
-			ending_final_b_youmu = self.create_item("[Youmu] Ending - Kaguya")
-			ending_final_b_yuyuko = self.create_item("[Yuyuko] Ending - Kaguya")
-			ending_extra_reimu = self.create_item("[Reimu] Ending - Mokou")
-			ending_extra_yukari = self.create_item("[Yukari] Ending - Mokou")
-			ending_extra_marisa = self.create_item("[Marisa] Ending - Mokou")
-			ending_extra_alice = self.create_item("[Alice] Ending - Mokou")
-			ending_extra_sakuya = self.create_item("[Sakuya] Ending - Mokou")
-			ending_extra_remilia = self.create_item("[Remilia] Ending - Mokou")
-			ending_extra_youmu = self.create_item("[Youmu] Ending - Mokou")
-			ending_extra_yuyuko = self.create_item("[Yuyuko] Ending - Mokou")
-
 			# If we have the extra stage and the extra boss is a potential goal
 			if extra and goal in [ENDING_EXTRA, ENDING_ALL]:
 				if characters in [TEAM_ONLY, ALL_CHARACTER]:
-					self.multiworld.get_location("[Illusion Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_illusion)
-					self.multiworld.get_location("[Magic Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_magic)
-					self.multiworld.get_location("[Devil Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_devil)
-					self.multiworld.get_location("[Nether Team] Stage Extra Clear", self.player).place_locked_item(ending_extra_nether)
+					self.multiworld.get_location("[Illusion Team] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Illusion Team] Ending - Mokou"))
+					self.multiworld.get_location("[Magic Team] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Magic Team] Ending - Mokou"))
+					self.multiworld.get_location("[Devil Team] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Devil Team] Ending - Mokou"))
+					self.multiworld.get_location("[Nether Team] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Nether Team] Ending - Mokou"))
 					number_placed_item += 4
 
 				if characters in [SOLO_ONLY, ALL_CHARACTER]:
-					self.multiworld.get_location("[Reimu] Stage Extra Clear", self.player).place_locked_item(ending_extra_reimu)
-					self.multiworld.get_location("[Yukari] Stage Extra Clear", self.player).place_locked_item(ending_extra_yukari)
-					self.multiworld.get_location("[Marisa] Stage Extra Clear", self.player).place_locked_item(ending_extra_marisa)
-					self.multiworld.get_location("[Alice] Stage Extra Clear", self.player).place_locked_item(ending_extra_alice)
-					self.multiworld.get_location("[Sakuya] Stage Extra Clear", self.player).place_locked_item(ending_extra_sakuya)
-					self.multiworld.get_location("[Remilia] Stage Extra Clear", self.player).place_locked_item(ending_extra_remilia)
-					self.multiworld.get_location("[Youmu] Stage Extra Clear", self.player).place_locked_item(ending_extra_youmu)
-					self.multiworld.get_location("[Yuyuko] Stage Extra Clear", self.player).place_locked_item(ending_extra_yuyuko)
+					self.multiworld.get_location("[Reimu] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Mokou"))
+					self.multiworld.get_location("[Yukari] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Yukari] Ending - Mokou"))
+					self.multiworld.get_location("[Marisa] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Mokou"))
+					self.multiworld.get_location("[Alice] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Alice] Ending - Mokou"))
+					self.multiworld.get_location("[Sakuya] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Mokou"))
+					self.multiworld.get_location("[Remilia] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Remilia] Ending - Mokou"))
+					self.multiworld.get_location("[Youmu] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Youmu] Ending - Mokou"))
+					self.multiworld.get_location("[Yuyuko] Stage Extra Clear", self.player).place_locked_item(self.create_item("[Yuyuko] Ending - Mokou"))
 					number_placed_item += 8
 
 			# If Eirin boss is a potential goal
 			if goal in [ENDING_FINAL_A, ENDING_ALL]:
 				if characters in [TEAM_ONLY, ALL_CHARACTER]:
-					self.multiworld.get_location("[Illusion Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_illusion)
-					self.multiworld.get_location("[Magic Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_magic)
-					self.multiworld.get_location("[Devil Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_devil)
-					self.multiworld.get_location("[Nether Team] Stage 6A Clear", self.player).place_locked_item(ending_final_a_nether)
+					self.multiworld.get_location("[Illusion Team] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Illusion Team] Ending - Eirin"))
+					self.multiworld.get_location("[Magic Team] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Magic Team] Ending - Eirin"))
+					self.multiworld.get_location("[Devil Team] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Devil Team] Ending - Eirin"))
+					self.multiworld.get_location("[Nether Team] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Nether Team] Ending - Eirin"))
 					number_placed_item += 4
 
 				if characters in [SOLO_ONLY, ALL_CHARACTER]:
-					self.multiworld.get_location("[Reimu] Stage 6A Clear", self.player).place_locked_item(ending_final_a_reimu)
-					self.multiworld.get_location("[Yukari] Stage 6A Clear", self.player).place_locked_item(ending_final_a_yukari)
-					self.multiworld.get_location("[Marisa] Stage 6A Clear", self.player).place_locked_item(ending_final_a_marisa)
-					self.multiworld.get_location("[Alice] Stage 6A Clear", self.player).place_locked_item(ending_final_a_alice)
-					self.multiworld.get_location("[Sakuya] Stage 6A Clear", self.player).place_locked_item(ending_final_a_sakuya)
-					self.multiworld.get_location("[Remilia] Stage 6A Clear", self.player).place_locked_item(ending_final_a_remilia)
-					self.multiworld.get_location("[Youmu] Stage 6A Clear", self.player).place_locked_item(ending_final_a_youmu)
-					self.multiworld.get_location("[Yuyuko] Stage 6A Clear", self.player).place_locked_item(ending_final_a_yuyuko)
+					self.multiworld.get_location("[Reimu] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Eirin"))
+					self.multiworld.get_location("[Yukari] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Yukari] Ending - Eirin"))
+					self.multiworld.get_location("[Marisa] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Eirin"))
+					self.multiworld.get_location("[Alice] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Alice] Ending - Eirin"))
+					self.multiworld.get_location("[Sakuya] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Eirin"))
+					self.multiworld.get_location("[Remilia] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Remilia] Ending - Eirin"))
+					self.multiworld.get_location("[Youmu] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Youmu] Ending - Eirin"))
+					self.multiworld.get_location("[Yuyuko] Stage 6A Clear", self.player).place_locked_item(self.create_item("[Yuyuko] Ending - Eirin"))
 					number_placed_item += 8
 
 			# If Kaguya boss is a potential goal
 			if (not extra and goal == ENDING_EXTRA) or goal in [ENDING_FINAL_B, ENDING_ALL]:
 				if characters in [TEAM_ONLY, ALL_CHARACTER]:
-					self.multiworld.get_location("[Illusion Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_illusion)
-					self.multiworld.get_location("[Magic Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_magic)
-					self.multiworld.get_location("[Devil Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_devil)
-					self.multiworld.get_location("[Nether Team] Stage 6B Clear", self.player).place_locked_item(ending_final_b_nether)
+					self.multiworld.get_location("[Illusion Team] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Illusion Team] Ending - Kaguya"))
+					self.multiworld.get_location("[Magic Team] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Magic Team] Ending - Kaguya"))
+					self.multiworld.get_location("[Devil Team] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Devil Team] Ending - Kaguya"))
+					self.multiworld.get_location("[Nether Team] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Nether Team] Ending - Kaguya"))
 					number_placed_item += 4
 
 				if characters in [SOLO_ONLY, ALL_CHARACTER]:
-					self.multiworld.get_location("[Reimu] Stage 6B Clear", self.player).place_locked_item(ending_final_b_reimu)
-					self.multiworld.get_location("[Yukari] Stage 6B Clear", self.player).place_locked_item(ending_final_b_yukari)
-					self.multiworld.get_location("[Marisa] Stage 6B Clear", self.player).place_locked_item(ending_final_b_marisa)
-					self.multiworld.get_location("[Alice] Stage 6B Clear", self.player).place_locked_item(ending_final_b_alice)
-					self.multiworld.get_location("[Sakuya] Stage 6B Clear", self.player).place_locked_item(ending_final_b_sakuya)
-					self.multiworld.get_location("[Remilia] Stage 6B Clear", self.player).place_locked_item(ending_final_b_remilia)
-					self.multiworld.get_location("[Youmu] Stage 6B Clear", self.player).place_locked_item(ending_final_b_youmu)
-					self.multiworld.get_location("[Yuyuko] Stage 6B Clear", self.player).place_locked_item(ending_final_b_yuyuko)
+					self.multiworld.get_location("[Reimu] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Reimu] Ending - Kaguya"))
+					self.multiworld.get_location("[Yukari] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Yukari] Ending - Kaguya"))
+					self.multiworld.get_location("[Marisa] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Marisa] Ending - Kaguya"))
+					self.multiworld.get_location("[Alice] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Alice] Ending - Kaguya"))
+					self.multiworld.get_location("[Sakuya] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Sakuya] Ending - Kaguya"))
+					self.multiworld.get_location("[Remilia] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Remilia] Ending - Kaguya"))
+					self.multiworld.get_location("[Youmu] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Youmu] Ending - Kaguya"))
+					self.multiworld.get_location("[Yuyuko] Stage 6B Clear", self.player).place_locked_item(self.create_item("[Yuyuko] Ending - Kaguya"))
 					number_placed_item += 8
 
 		if mode in SPELL_PRACTICE_MODE and duplicate_spell_cards > 0:
