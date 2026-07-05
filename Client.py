@@ -1222,14 +1222,21 @@ class TouhouContext(CommonContext):
 						resourcesGiven = True
 						currentLives = self.handler.getCurrentLives()
 
-					# We check if the current score is the same or higher than the previous one
-					if(currentScore <= self.handler.getCurrentScore() or (self.options['mode'] in NORMAL_MODE and currentContinue <= self.handler.getCurrentContinues())):
-						currentScore = self.handler.getCurrentScore()
-						currentContinue = self.handler.getCurrentContinues()
+					# If we're in normal mode, we check the case where a continue is used (except in the Extra Stage)
+					if self.options['mode'] not in NORMAL_MODE or currentContinue == self.handler.getCurrentContinues() or currentStage == 9:
+						# We check if the current score is the same or higher than the previous one
+						if(currentScore <= self.handler.getCurrentScore()):
+							currentScore = self.handler.getCurrentScore()
+						else:
+							# If the score is lower, it mean the stage has been restarted, we end the loop and act like we just enter the stage
+							currentMode = -1
+							resourcesGiven = False
+							continue
 					else:
-						# If the score is lower, it mean the stage has been restarted, we end the loop and act like we just enter the stage
-						currentMode = -1
-						resourcesGiven = False
+						currentScore = 0
+						currentContinue = self.handler.getCurrentContinues()
+						# We wait a second for the score in game to properly reset
+						await asyncio.sleep(1)
 						continue
 
 					# Boss Check
@@ -1318,6 +1325,7 @@ class TouhouContext(CommonContext):
 				if game_mode != IN_GAME:
 					menu = self.handler.getMenu()
 					if menu == -1:
+						await asyncio.sleep(0.5)
 						continue
 
 					# We check where we are in the menu in order to determine how we lock/unlock the characters
@@ -1490,6 +1498,7 @@ class TouhouContext(CommonContext):
 			onGoingDeathLink = False
 			inLevel = False
 			currentMisses = 0
+			currentLives = 0
 			nb_death = 0
 			previous_menu = 0
 
@@ -1510,6 +1519,7 @@ class TouhouContext(CommonContext):
 					if not inLevel:
 						inLevel = True
 						currentMisses = self.handler.getMisses()
+						currentLives = self.handler.getCurrentLives()
 						onGoingDeathLink = False
 						self.pending_death_link = False
 
@@ -1530,7 +1540,7 @@ class TouhouContext(CommonContext):
 							onGoingDeathLink = False
 							self.pending_death_link = False
 						else:
-							if self.death_link_trigger == DEATH_LINK_LIFE or (self.death_link_trigger == DEATH_LINK_GAME_OVER and self.handler.getCurrentLives() == 0):
+							if self.death_link_trigger == DEATH_LINK_LIFE or (self.death_link_trigger == DEATH_LINK_GAME_OVER and currentLives == 0):
 								nb_death += 1
 								if nb_death >= self.death_link_amnesty:
 									await self.send_death_link()
@@ -1543,6 +1553,10 @@ class TouhouContext(CommonContext):
 					# If no death has occured but a death link is pending, we try to kill the player
 					elif self.pending_death_link:
 						await self.handler.killPlayer()
+
+					# If the number of lives changed, we update it.
+					if currentLives != self.handler.getCurrentLives():
+						currentLives = self.handler.getCurrentLives()
 				else:
 					menu = self.handler.getMenu()
 					if menu > 0 and menu < 20:
